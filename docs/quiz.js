@@ -253,7 +253,7 @@ function pickRandomQuestion() {
         }
     }
 
-    if (unanswered) {
+    if (unanswered.length > 0) {
         candidates = unanswered;
     }
 
