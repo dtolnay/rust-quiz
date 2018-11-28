@@ -1,0 +1,84 @@
+html, body {
+    height: 100%;
+}
+
+.page {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    display: table;
+}
+
+.container {
+    max-width: 650px;
+}
+
+.notbold {
+    font-weight: 100;
+}
+
+.hljs {
+    background: transparent;
+}
+
+#text-output {
+    display: inline;
+    margin-top: -100%;
+    width: 100px;
+}
+
+.reset {
+    display: table-row;
+    vertical-align: bottom;
+    text-align: right;
+    height: 0;
+    line-height: 0;
+}
+
+.reset-link {
+    display: block;
+    height: 0;
+    position: relative;
+    right: 10px;
+    bottom: 10px;
+}
+
+.reset-link:after {
+    content: "[Reset]";
+}
+
+#accordion {
+    transition: font-size .25s, opacity .5s .10s;
+    padding-left: 10px;
+}
+
+@media screen and (min-width: 450px) {
+    #accordion {
+        padding-left: 30px !important;
+    }
+}
+
+#accordion:not(.show) {
+    font-size: 0;
+    opacity: 0;
+    transition: opacity .25s, font-size .5s .15s;
+}
+
+#button-reveal:not(:hover) #sad {
+    display: none;
+}
+
+#explanation-content pre {
+    padding-left: 30px;
+}
+
+p code {
+    margin-left: 2px;
+    margin-right: 2px;
+    vertical-align: .5px;
+    color: crimson;
+}
+
+#form label {
+    display: inline !important;
+}
