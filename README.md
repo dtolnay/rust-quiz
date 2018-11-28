@@ -15,6 +15,12 @@ https://dtolnay.github.io/rust-quiz
 </b>
 </p>
 
+<p align="center">
+<a href="https://dtolnay.github.io/rust-quiz">
+<img src="https://raw.githubusercontent.com/dtolnay/rust-quiz/master/screenshot.png" width="300">
+</a>
+</p>
+
 <br>
 
 *If you enjoy the Rust Quiz and also know C++, you may like to check out
