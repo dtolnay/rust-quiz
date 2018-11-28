@@ -82,3 +82,7 @@ p code {
 #form label {
     display: inline !important;
 }
+
+a code {
+    text-decoration: underline;
+}
