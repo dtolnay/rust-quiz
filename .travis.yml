@@ -1,0 +1,7 @@
+language: rust
+
+rust: nightly
+
+script:
+  - cargo run
+  - git diff --exit-code
