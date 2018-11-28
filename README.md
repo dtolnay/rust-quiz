@@ -1,0 +1,72 @@
+Rust Quiz
+=========
+
+#### What is the output of this Rust program?
+
+<br>
+
+<p align="center">
+<b>
+<a href="https://dtolnay.github.io/rust-quiz">
+<code>
+https://dtolnay.github.io/rust-quiz
+</code>
+</a>
+</b>
+</p>
+
+<br>
+
+*If you enjoy the Rust Quiz and also know C++, you may like to check out
+http://cppquiz.org which inspired this project.*
+
+## Contributing
+
+I welcome suggestions for new quiz questions, either by filing a GitHub issue in
+this repository or by sending a pull request containing your question, hint,
+answer, and explanation of the answer.
+
+The best questions are drawn from personal experience writing or reading Rust
+code and being bewildered by its behavior.
+
+The website shows choices for "undefined behavior" and "does not compile", but
+please prefer adding questions that do compile and are well-defined.
+
+- Not fun: "does this program compile or does it not compile?"
+- Not fun: "is this undefined behavior or is it not?"
+- Fun: "does this print obvious possibility A or obvious possibility B?"
+
+To add a question, you need to add one *.rs* file and one *.md* file under the
+*questions/* directory. Pick a very brief (2-4 words) description to include in
+the file names. Please use 000 as the question number to avoid races between
+concurrent pull requests. I will assign a number when merging.
+
+Refer to an existing *.md* file and copy the format. In particular, you will
+need to provide a correct answer on the first line, a difficulty rating (1, 2 or
+3) on the second line, a **Hint** section, and an **Explanation** section.
+
+When writing a hint, keep it brief. Maximum three lines, maximum two sentences
+is ideal.
+
+In the explanation, feel free to be as thorough as possible without dwelling on
+concepts that are not relevant to the crux of the quiz question.
+
+To launch the site locally and preview your rendered Markdown, run the
+following inside this directory.
+
+```bash
+# Package all the questions into a single JavaScript file.
+cargo run
+
+# Start up a static file server.
+python -m SimpleHTTPServer
+```
+
+Then your question, assuming you numbered it 000, will be accessible at
+http\://localhost:8000/rust-quiz/1.
+
+## License
+
+The quiz questions, explanations, website, and all other intellectual property
+in this repository are all licensed under the [Creative Commons
+Attribution-ShareAlike 4.0 International License](LICENSE-CC-BY-SA).
