@@ -1,0 +1,11 @@
+image: alpine:latest
+
+pages:
+  stage: deploy
+  script:
+    - echo static html
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
