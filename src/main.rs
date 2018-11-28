@@ -90,7 +90,7 @@ fn main() -> Result<()> {
 
     let json_object = serde_json::to_string_pretty(&questions)?;
     let javascript = format!("var questions = {};\n", json_object);
-    fs::write("public/questions.js", javascript)?;
+    fs::write("docs/questions.js", javascript)?;
 
     Ok(())
 }
