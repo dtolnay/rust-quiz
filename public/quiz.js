@@ -78,7 +78,7 @@ function init() {
         hide(incorrect);
         textOutput.select();
     };
-    total.innerHTML = questions.length;
+    total.innerHTML = countQuestions();
     loadState();
     updateProgress();
     initQuestion();
@@ -95,9 +95,10 @@ function initQuestion() {
     var path = window.location.pathname;
     var pathMatch = /^\/rust-quiz\/([0-9]+)\/?$/g.exec(path);
     if (pathMatch !== null) {
-        var i = parseInt(pathMatch[1], 10);
-        if (!isNaN(i) && i < questions.length) {
-            q = i - 1;
+        var key = pathMatch[1];
+        var number = parseInt(key, 10);
+        if (!isNaN(number) && key in questions) {
+            q = number;
         }
     }
 
@@ -107,7 +108,7 @@ function initQuestion() {
 
     try {
         setTitle();
-        var path = "/rust-quiz/" + (q + 1);
+        var path = "/rust-quiz/" + q;
         window.history.replaceState({question: q}, document.title, path);
     }
     catch(e) {
@@ -115,7 +116,7 @@ function initQuestion() {
 }
 
 function activateQuestion() {
-    current.innerHTML = q + 1;
+    current.innerHTML = q;
     questionNumber.title = "Difficulty:  " + difficultyStars();
     show(questionNumber);
     code.innerHTML = "";
@@ -149,7 +150,7 @@ function nextQuestion() {
         activateQuestion();
 
         try {
-            var path = "/rust-quiz/" + (q + 1);
+            var path = "/rust-quiz/" + q;
             window.history.pushState({question: q}, document.title, path);
         }
         catch(e) {
@@ -241,13 +242,14 @@ function saveState() {
 function pickRandomQuestion() {
     var candidates = [];
     var unanswered = [];
-    for (var i = 0; i < questions.length; i++) {
-        if (i === q) {
+    for (var i in questions) {
+        var number = parseInt(i, 10);
+        if (isNaN(number) || number === q) {
             continue;
         }
-        candidates.push(i);
-        if (!state[i]) {
-            unanswered.push(i);
+        candidates.push(number);
+        if (!state[number]) {
+            unanswered.push(number);
         }
     }
 
@@ -260,13 +262,21 @@ function pickRandomQuestion() {
 }
 
 function setTitle() {
-    document.title = "Rust Quiz #" + (q + 1);
+    document.title = "Rust Quiz #" + q;
+}
+
+function countQuestions() {
+    var size = 0;
+    for (var key in questions) {
+        size += 1;
+    }
+    return size;
 }
 
 function updateProgress() {
     var count = 0;
-    for (var i = 0; i < questions.length; i++) {
-        if (state[i]) {
+    for (var key in questions) {
+        if (state[key]) {
             count++;
         }
     }

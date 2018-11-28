@@ -63,7 +63,7 @@ python -m SimpleHTTPServer
 ```
 
 Then your question, assuming you numbered it 000, will be accessible at
-http\://localhost:8000/rust-quiz/1.
+http\://localhost:8000/rust-quiz/0.
 
 ## License
 

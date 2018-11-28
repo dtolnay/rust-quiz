@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
@@ -55,7 +56,7 @@ fn main() -> Result<()> {
 
     question_files.sort();
 
-    let mut questions = Vec::new();
+    let mut questions = BTreeMap::new();
     for path in question_files {
         println!("evaluating {}", path.display());
         let code = fs::read_to_string(&path)?;
@@ -69,7 +70,16 @@ fn main() -> Result<()> {
 
         check_answer(&path, &answer);
 
-        questions.push(Question {
+        let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").unwrap();
+        let number = match re.captures(&path.to_str().unwrap()) {
+            Some(cap) => cap[1].parse::<u16>().unwrap(),
+            None => {
+                eprintln!("ERROR: wrong filename format.");
+                process::exit(1);
+            }
+        };
+
+        questions.insert(number, Question {
             code,
             answer,
             difficulty,
@@ -78,8 +88,8 @@ fn main() -> Result<()> {
         });
     }
 
-    let json_array = serde_json::to_string_pretty(&questions)?;
-    let javascript = format!("var questions = {};\n", json_array);
+    let json_object = serde_json::to_string_pretty(&questions)?;
+    let javascript = format!("var questions = {};\n", json_object);
     fs::write("public/questions.js", javascript)?;
 
     Ok(())
