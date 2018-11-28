@@ -3,7 +3,7 @@ Difficulty: 1
 
 # Hint
 
-Trait method auto-ref is covered in [this excellent Stack Overflow answer][SO].
+Trait method auto-ref is covered in [this Stack Overflow answer][SO].
 
 [SO]: https://stackoverflow.com/a/28552082/6086311
 

@@ -52,7 +52,7 @@ warning: unreachable pattern
    |             ^^^^^^ unreachable pattern
 ```
 
-Second, it recognizes what the program has done wrong and what they probably
+Second, it recognizes what the programmer has done wrong and what they probably
 meant to write instead.
 
 ```

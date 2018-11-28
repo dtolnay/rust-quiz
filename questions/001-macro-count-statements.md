@@ -106,7 +106,7 @@ It remains to determine how many statements are in the three invocations of
 
 3. `{return} || true`
 
-    This one is two statements! A block-statement `{return}` followed by an
+    This one is two statements! A block-statement `{return}` followed by a
     closure expression `|| true`.
 
     The Rust grammar distinguishes between expressions that require a semicolon
