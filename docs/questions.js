@@ -1,4 +1,11 @@
 var questions = {
+  "0": {
+    "code": "\ntrait Base {\n    fn method(&self) {print!(\"1\")}\n}\n\ntrait Derived: Base {\n    fn method(&self) {print!(\"2\")}\n}\n\nstruct OnlyBase;\n\nimpl Base for OnlyBase {\n    fn method(&self) {print!(\"3\")}\n}\n\n\nstruct BothTraits;\nimpl Base for BothTraits {}\nimpl Derived for BothTraits {}\n\n// dynamic dispatch\nfn dynamic(x: &dyn Base) {\n    x.method()\n}\n\n// static dispatch\nfn stat<T: Base>(x: &T) {\n    x.method();\n}\n\nfn main() {\n    dynamic(&OnlyBase);\n    stat(&OnlyBase);\n    dynamic(&BothTraits);\n    stat(&BothTraits);\n}",
+    "difficulty": 1,
+    "answer": "3311",
+    "hint": "<p>All traits have an independent set of methods.</p>\n",
+    "explanation": "<p>The trait <code>Base</code> has a default method <code>method</code>. Its impl for <code>OnlyBase</code> overrides that default method. Default methods are basically sugar for &quot;copy this method into each trait impl that doesn't explicitly define this method&quot;. Once you override the default method there is no way to call the original default method for that given type. So both static and dynamic dispatch on <code>OnlyBase</code> produce the number <code>3</code>, from calling the <code>method</code> from <code>impl Base for OnlyBase</code>.</p>\n<p>While subtraits <em>can</em> define methods conflicting with the base trait, these are <em>independent</em> methods, and do not override the original. Trait inheritance does not override methods, trait inheritance is a way of saying &quot;all implementors of this trait <em>must</em> implement the parent trait&quot;. Both <code>stat()</code> and <code>dynamic()</code> refer to the trait <code>Base</code>, so we look for a <code>method()</code> from <code>impl Base for OnlyBase</code>, which turns out to be the default method, so both these calls produce <code>1</code>.</p>\n"
+  },
   "1": {
     "code": "macro_rules! m {\n    ($($s:stmt)*) => {\n        $(\n            { stringify!($s); 1 }\n        )<<*\n    };\n}\n\nfn main() {\n    print!(\n        \"{}{}{}\",\n        m! { return || true },\n        m! { (return) || true },\n        m! { {return} || true },\n    );\n}\n",
     "difficulty": 3,
