@@ -67,7 +67,7 @@ Let's consider what happens in each of the two methods called from `main`.
     because `x` is of type `dyn Base` and there is no implementation of
     `Derived` for `dyn Base`.
 
-- `static_dispatch(&BothTraits)`
+- `static_dispatch(BothTraits)`
 
     At compile time we know that `x.method()` is a call to `<T as
     Base>::method`. Type inference within generic functions in Rust happens
