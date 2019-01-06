@@ -16,10 +16,12 @@ We want to know whether each possible parenthesization of `return || true;` and
     = || {}`. When we call `x().f()`, the method `f` resolves to `impl Trait for
     ()` which prints `2`.
 
-    The type of the *expression* `(return)` is the unreachable type `!`. It is
-    legal to compute `! || true` because `!` can fill in for any type, in this
-    case bool. The expression `! || true` is a logical-OR with bool on both the
-    left-hand side and right-hand side.
+    The type of the *expression* `(return)` is the primitive [never] type,
+    usually written as `!`. It is legal to compute `! || true` because `!` can
+    fill in for any type, in this case bool. The expression `! || true` is a
+    logical-OR with bool on both the left-hand side and right-hand side.
+
+    [never]: https://doc.rust-lang.org/std/primitive.never.html
 
     The behavior of `!` of filling in for any type is what allows us to write:
 
@@ -34,9 +36,9 @@ We want to know whether each possible parenthesization of `return || true;` and
 
 - `let x = loop { (break) || true; };`
 
-    Similar to `(return)`, the type of `(break)` is the unreachable type `!`.
-    This code breaks out of the loop with the implicit value `()`, so `x` is of
-    type `()`. Calling `x.f()` will print `2`.
+    Similar to `(return)`, the type of `(break)` is the never type `!`. This
+    code breaks out of the loop with the implicit value `()`, so `x` is of type
+    `()`. Calling `x.f()` will print `2`.
 
 - `let x = || { return (|| true); };`
 
