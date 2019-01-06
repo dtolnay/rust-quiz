@@ -3,5 +3,7 @@ language: rust
 rust: nightly
 
 script:
+  - rm -f questions/000-*
   - cargo run
+  - git checkout -- questions
   - git diff --exit-code
