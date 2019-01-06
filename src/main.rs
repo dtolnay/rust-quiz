@@ -129,6 +129,7 @@ fn render_to_html(markdown: &str) -> String {
     let parser = pulldown_cmark::Parser::new(markdown);
     let mut html = String::new();
     pulldown_cmark::html::push_html(&mut html, parser);
+    html = html.replace("<a href=\"", "<a target=\"_blank\" href=\"");
     html
 }
 
