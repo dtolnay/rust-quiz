@@ -86,3 +86,7 @@ p code {
 a code {
     text-decoration: underline;
 }
+
+#footer p {
+    margin-bottom: 0;
+}
