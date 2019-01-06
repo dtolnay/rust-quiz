@@ -281,6 +281,9 @@ function updateProgress() {
         }
     }
     answered.innerHTML = count;
+    if (count === countQuestions()) {
+        show(contribute);
+    }
     if (count > 0) {
         show(buttonReset);
     }
@@ -297,6 +300,7 @@ function reset() {
     state = {};
     window.localStorage.clear();
     answered.innerHTML = 0;
+    hide(contribute);
     hide(buttonReset);
 }
 
