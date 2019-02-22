@@ -138,8 +138,8 @@ fn check_answer(path: &Path, expected: &str) {
 
     let status = Command::new("rustc")
         .arg(path)
-        .arg("--out-dir")
-        .arg("/tmp/rust-quiz")
+        .arg("--edition=2018")
+        .arg("--out-dir=/tmp/rust-quiz")
         .stderr(Stdio::null())
         .status()
         .expect("failed to execute rustc");
