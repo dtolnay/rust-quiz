@@ -59,7 +59,7 @@ We want to know whether each possible parenthesization of `return || true;` and
 - `let x = || { return || true; };`
 
     Now we arrive at the meat of this quiz question. Is `return || true` parsed
-    thet same as `(return) || true` or as `return (|| true)`?
+    the same as `(return) || true` or as `return (|| true)`?
 
     It turns out to be the latter, so `x` is a closure that returns a closure
     that returns true. `x().f()` prints `1`.
