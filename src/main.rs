@@ -79,13 +79,16 @@ fn main() -> Result<()> {
             }
         };
 
-        questions.insert(number, Question {
-            code,
-            answer,
-            difficulty,
-            hint,
-            explanation,
-        });
+        questions.insert(
+            number,
+            Question {
+                code,
+                answer,
+                difficulty,
+                hint,
+                explanation,
+            },
+        );
     }
 
     let json_object = serde_json::to_string_pretty(&questions)?;
