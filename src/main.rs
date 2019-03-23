@@ -4,6 +4,7 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
+use std::string::FromUtf8Error;
 
 use regex::Regex;
 use serde::Serialize;
@@ -75,7 +76,7 @@ fn try_main() -> Result<()> {
             explanation,
         } = parse_markdown(path.with_extension("md"))?;
 
-        check_answer(&path, &answer);
+        check_answer(&path, &answer)?;
 
         let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").unwrap();
         let number = match re.captures(&path.to_str().unwrap()) {
@@ -133,9 +134,12 @@ fn render_to_html(markdown: &str) -> String {
     html
 }
 
-fn check_answer(path: &Path, expected: &str) {
-    let stem = path.file_stem().unwrap().to_str().unwrap();
+enum Status {
+    Ok,
+    Err,
+}
 
+fn check_answer(path: &Path, expected: &str) -> Result<()> {
     let status = Command::new("rustc")
         .arg(path)
         .arg("--edition=2018")
@@ -144,35 +148,77 @@ fn check_answer(path: &Path, expected: &str) {
         .status()
         .expect("failed to execute rustc");
 
-    match expected {
-        "undefined" => {
-            assert!(status.success());
-            return;
-        }
-        "error" => {
-            assert!(!status.success(), "expected program to fail to compile");
-            return;
-        }
-        _ => {
-            assert!(status.success());
-        }
-    }
+    let status = match status.success() {
+        true => Status::Ok,
+        false => Status::Err,
+    };
 
+    match (expected, status) {
+        ("undefined", Status::Ok) | ("error", Status::Err) => Ok(()),
+        ("undefined", Status::Err) => Err(Error::UndefinedShouldCompile),
+        ("error", Status::Ok) => Err(Error::ShouldNotCompile),
+        (_, Status::Err) => Err(Error::ShouldCompile),
+        (_, Status::Ok) => run(path, expected),
+    }
+}
+
+fn run(path: &Path, expected: &str) -> Result<()> {
+    let stem = path.file_stem().unwrap().to_str().unwrap();
     let output = Command::new(format!("/tmp/rust-quiz/{}", stem))
         .output()
         .expect("failed to execute quiz question");
-    let output_string = String::from_utf8(output.stdout).unwrap();
-    assert_eq!(expected, output_string, "{}", path.display());
+    let output = String::from_utf8(output.stdout)?;
+
+    if output == expected {
+        Ok(())
+    } else {
+        Err(Error::WrongOutput {
+            expected: expected.to_owned(),
+            output,
+        })
+    }
 }
 
 enum Error {
     Io(io::Error),
     Json(serde_json::Error),
+    Utf8(FromUtf8Error),
     FilenameFormat,
     MarkdownFormat(PathBuf),
+    ShouldCompile,
+    ShouldNotCompile,
+    UndefinedShouldCompile,
+    WrongOutput { expected: String, output: String },
 }
 
 type Result<T> = std::result::Result<T, Error>;
+
+impl Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::Error::*;
+
+        match self {
+            Io(e) => write!(f, "{}", e),
+            Json(e) => write!(f, "{}", e),
+            Utf8(e) => write!(f, "{}", e),
+            FilenameFormat => write!(f, "wrong filename format"),
+            MarkdownFormat(path) => write!(
+                f,
+                "{} does not match the expected format.\n{}",
+                path.display(),
+                MARKDOWN_FORMAT,
+            ),
+            ShouldCompile => write!(f, "program failed to compile"),
+            ShouldNotCompile => write!(f, "program should fail to compile"),
+            UndefinedShouldCompile => write!(f, "program with undefined behavior should compile"),
+            WrongOutput { expected, output } => write!(
+                f,
+                "wrong output! expected: {}, actual: {}",
+                expected, output
+            ),
+        }
+    }
+}
 
 impl From<io::Error> for Error {
     fn from(err: io::Error) -> Self {
@@ -186,20 +232,8 @@ impl From<serde_json::Error> for Error {
     }
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::Error::*;
-
-        match self {
-            Io(e) => write!(f, "{}", e),
-            Json(e) => write!(f, "{}", e),
-            FilenameFormat => write!(f, "wrong filename format"),
-            MarkdownFormat(path) => write!(
-                f,
-                "{} does not match the expected format.\n{}",
-                path.display(),
-                MARKDOWN_FORMAT,
-            ),
-        }
+impl From<FromUtf8Error> for Error {
+    fn from(err: FromUtf8Error) -> Self {
+        Error::Utf8(err)
     }
 }
