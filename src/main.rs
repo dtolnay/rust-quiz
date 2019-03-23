@@ -1,12 +1,12 @@
 use std::collections::BTreeMap;
+use std::fmt::{self, Display};
 use std::fs;
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
 
 use regex::Regex;
 use serde::Serialize;
-
-type Result<T> = std::result::Result<T, Box<std::error::Error>>;
 
 #[derive(Serialize)]
 struct Question {
@@ -44,7 +44,14 @@ const MARKDOWN_FORMAT: &str = "
     <!-- markdown -->
 ";
 
-fn main() -> Result<()> {
+fn main() {
+    if let Err(err) = try_main() {
+        let _ = write!(io::stderr(), "{}", err);
+        process::exit(1);
+    }
+}
+
+fn try_main() -> Result<()> {
     let mut question_files = Vec::new();
     for entry in fs::read_dir("questions")? {
         let entry = entry?;
@@ -166,4 +173,34 @@ fn check_answer(path: &Path, expected: &str) {
         .expect("failed to execute quiz question");
     let output_string = String::from_utf8(output.stdout).unwrap();
     assert_eq!(expected, output_string, "{}", path.display());
+}
+
+enum Error {
+    Io(io::Error),
+    Json(serde_json::Error),
+}
+
+type Result<T> = std::result::Result<T, Error>;
+
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Self {
+        Error::Io(err)
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(err: serde_json::Error) -> Self {
+        Error::Json(err)
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::Error::*;
+
+        match self {
+            Io(e) => write!(f, "{}", e),
+            Json(e) => write!(f, "{}", e),
+        }
+    }
 }
