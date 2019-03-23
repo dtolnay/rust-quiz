@@ -146,7 +146,7 @@ fn check_answer(path: &Path, expected: &str) -> Result<()> {
         .arg("--out-dir=/tmp/rust-quiz")
         .stderr(Stdio::null())
         .status()
-        .expect("failed to execute rustc");
+        .map_err(Error::Rustc)?;
 
     let status = match status.success() {
         true => Status::Ok,
@@ -185,6 +185,7 @@ enum Error {
     Utf8(FromUtf8Error),
     FilenameFormat,
     MarkdownFormat(PathBuf),
+    Rustc(io::Error),
     ShouldCompile,
     ShouldNotCompile,
     UndefinedShouldCompile,
@@ -209,6 +210,7 @@ impl Display for Error {
                 path.display(),
                 MARKDOWN_FORMAT,
             ),
+            Rustc(e) => write!(f, "failed to execute rustc: {}", e),
             ShouldCompile => write!(f, "program failed to compile"),
             ShouldNotCompile => write!(f, "program should fail to compile"),
             UndefinedShouldCompile => write!(f, "program with undefined behavior should compile"),
