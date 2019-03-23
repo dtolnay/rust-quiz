@@ -90,3 +90,8 @@ a code {
 #footer p {
     margin-bottom: 0;
 }
+
+blockquote {
+    padding-left: 30px;
+    font-style: italic;
+}
