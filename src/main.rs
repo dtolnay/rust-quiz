@@ -46,7 +46,7 @@ const MARKDOWN_FORMAT: &str = "
 
 fn main() {
     if let Err(err) = try_main() {
-        let _ = write!(io::stderr(), "{}", err);
+        let _ = write!(io::stderr(), "ERROR: {}", err);
         process::exit(1);
     }
 }
@@ -80,10 +80,7 @@ fn try_main() -> Result<()> {
         let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").unwrap();
         let number = match re.captures(&path.to_str().unwrap()) {
             Some(cap) => cap[1].parse::<u16>().unwrap(),
-            None => {
-                eprintln!("ERROR: wrong filename format.");
-                process::exit(1);
-            }
+            None => return Err(Error::FilenameFormat),
         };
 
         questions.insert(
@@ -117,14 +114,7 @@ fn parse_markdown(path: PathBuf) -> Result<Markdown> {
     let re = Regex::new(MARKDOWN_REGEX).unwrap();
     let cap = match re.captures(&content) {
         Some(cap) => cap,
-        None => {
-            eprintln!(
-                "ERROR: {} does not match the expected format.\n{}",
-                path.display(),
-                MARKDOWN_FORMAT,
-            );
-            process::exit(1);
-        }
+        None => return Err(Error::MarkdownFormat(path)),
     };
 
     Ok(Markdown {
@@ -178,6 +168,8 @@ fn check_answer(path: &Path, expected: &str) {
 enum Error {
     Io(io::Error),
     Json(serde_json::Error),
+    FilenameFormat,
+    MarkdownFormat(PathBuf),
 }
 
 type Result<T> = std::result::Result<T, Error>;
@@ -201,6 +193,13 @@ impl Display for Error {
         match self {
             Io(e) => write!(f, "{}", e),
             Json(e) => write!(f, "{}", e),
+            FilenameFormat => write!(f, "wrong filename format"),
+            MarkdownFormat(path) => write!(
+                f,
+                "{} does not match the expected format.\n{}",
+                path.display(),
+                MARKDOWN_FORMAT,
+            ),
         }
     }
 }
