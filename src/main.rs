@@ -166,7 +166,7 @@ fn run(path: &Path, expected: &str) -> Result<()> {
     let stem = path.file_stem().unwrap().to_str().unwrap();
     let output = Command::new(format!("/tmp/rust-quiz/{}", stem))
         .output()
-        .expect("failed to execute quiz question");
+        .map_err(Error::Execute)?;
     let output = String::from_utf8(output.stdout)?;
 
     if output == expected {
@@ -188,6 +188,7 @@ enum Error {
     ShouldCompile,
     ShouldNotCompile,
     UndefinedShouldCompile,
+    Execute(io::Error),
     WrongOutput { expected: String, output: String },
 }
 
@@ -211,6 +212,7 @@ impl Display for Error {
             ShouldCompile => write!(f, "program failed to compile"),
             ShouldNotCompile => write!(f, "program should fail to compile"),
             UndefinedShouldCompile => write!(f, "program with undefined behavior should compile"),
+            Execute(e) => write!(f, "failed to execute quiz question: {}", e),
             WrongOutput { expected, output } => write!(
                 f,
                 "wrong output! expected: {}, actual: {}",
