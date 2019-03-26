@@ -125,9 +125,9 @@ fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
 
     check_answer(path, &answer)?;
 
-    let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").unwrap();
+    let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
     let number = match re.captures(&path.to_str().unwrap()) {
-        Some(cap) => cap[1].parse::<u16>().unwrap(),
+        Some(cap) => cap[1].parse::<u16>().expect("three decimal digits"),
         None => return Err(Error::FilenameFormat),
     };
 
@@ -155,7 +155,7 @@ struct Markdown {
 
 fn parse_markdown(path: PathBuf) -> Result<Markdown> {
     let content = fs::read_to_string(&path)?;
-    let re = Regex::new(MARKDOWN_REGEX).unwrap();
+    let re = Regex::new(MARKDOWN_REGEX).expect("valid regex");
     let cap = match re.captures(&content) {
         Some(cap) => cap,
         None => return Err(Error::MarkdownFormat(path)),
