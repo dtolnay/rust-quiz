@@ -5,44 +5,47 @@ use std::string::FromUtf8Error;
 
 use rayon::ThreadPoolBuildError;
 
+#[remain::sorted]
 pub enum Error {
+    Execute(io::Error),
+    FilenameFormat,
     Io(io::Error),
     Json(serde_json::Error),
-    Rayon(ThreadPoolBuildError),
-    Utf8(FromUtf8Error),
-    FilenameFormat,
     MarkdownFormat(PathBuf),
+    Rayon(ThreadPoolBuildError),
     Rustc(io::Error),
     ShouldCompile,
     ShouldNotCompile,
     UndefinedShouldCompile,
-    Execute(io::Error),
+    Utf8(FromUtf8Error),
     WrongOutput { expected: String, output: String },
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
 
 impl Display for Error {
+    #[remain::check]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use self::Error::*;
 
+        #[sorted]
         match self {
+            Execute(e) => write!(f, "failed to execute quiz question: {}", e),
+            FilenameFormat => write!(f, "wrong filename format"),
             Io(e) => write!(f, "{}", e),
             Json(e) => write!(f, "{}", e),
-            Rayon(e) => write!(f, "{}", e),
-            Utf8(e) => write!(f, "{}", e),
-            FilenameFormat => write!(f, "wrong filename format"),
             MarkdownFormat(path) => write!(
                 f,
                 "{} does not match the expected format.\n{}",
                 path.display(),
                 super::MARKDOWN_FORMAT,
             ),
+            Rayon(e) => write!(f, "{}", e),
             Rustc(e) => write!(f, "failed to execute rustc: {}", e),
             ShouldCompile => write!(f, "program failed to compile"),
             ShouldNotCompile => write!(f, "program should fail to compile"),
             UndefinedShouldCompile => write!(f, "program with undefined behavior should compile"),
-            Execute(e) => write!(f, "failed to execute quiz question: {}", e),
+            Utf8(e) => write!(f, "{}", e),
             WrongOutput { expected, output } => write!(
                 f,
                 "wrong output! expected: {}, actual: {}",
