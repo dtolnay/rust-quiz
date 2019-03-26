@@ -3,9 +3,12 @@ use std::io;
 use std::path::PathBuf;
 use std::string::FromUtf8Error;
 
+use rayon::ThreadPoolBuildError;
+
 pub enum Error {
     Io(io::Error),
     Json(serde_json::Error),
+    Rayon(ThreadPoolBuildError),
     Utf8(FromUtf8Error),
     FilenameFormat,
     MarkdownFormat(PathBuf),
@@ -26,6 +29,7 @@ impl Display for Error {
         match self {
             Io(e) => write!(f, "{}", e),
             Json(e) => write!(f, "{}", e),
+            Rayon(e) => write!(f, "{}", e),
             Utf8(e) => write!(f, "{}", e),
             FilenameFormat => write!(f, "wrong filename format"),
             MarkdownFormat(path) => write!(

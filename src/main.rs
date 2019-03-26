@@ -1,3 +1,5 @@
+mod ahead;
+mod broker;
 mod error;
 
 use std::collections::BTreeMap;
@@ -6,9 +8,12 @@ use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
 
+use parking_lot::Mutex;
+use rayon::ThreadPoolBuilder;
 use regex::Regex;
 use serde::Serialize;
 
+use crate::broker::Broker;
 use crate::error::{Error, Result};
 
 #[derive(Serialize)]
@@ -49,7 +54,7 @@ const MARKDOWN_FORMAT: &str = "
 
 fn main() {
     if let Err(err) = try_main() {
-        let _ = write!(io::stderr(), "ERROR: {}", err);
+        let _ = writeln!(io::stderr(), "ERROR: {}", err);
         process::exit(1);
     }
 }
@@ -63,44 +68,80 @@ fn try_main() -> Result<()> {
             question_files.push(path);
         }
     }
-
     question_files.sort();
 
-    let mut questions = BTreeMap::new();
-    for path in question_files {
-        println!("evaluating {}", path.display());
-        let code = fs::read_to_string(&path)?;
+    let cpus = num_cpus::get();
+    let pool = ThreadPoolBuilder::new()
+        .num_threads(cpus)
+        .build()
+        .map_err(Error::Rayon)?;
 
-        let Markdown {
-            answer,
-            difficulty,
-            hint,
-            explanation,
-        } = parse_markdown(path.with_extension("md"))?;
+    let broker = Broker::new();
+    let questions = Mutex::new(BTreeMap::new());
+    pool.scope(|scope| {
+        for _ in 0..cpus {
+            scope.spawn(|_| worker(&broker, &question_files, &questions));
+        }
+    });
 
-        check_answer(&path, &answer)?;
-
-        let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").unwrap();
-        let number = match re.captures(&path.to_str().unwrap()) {
-            Some(cap) => cap[1].parse::<u16>().unwrap(),
-            None => return Err(Error::FilenameFormat),
-        };
-
-        questions.insert(
-            number,
-            Question {
-                code,
-                answer,
-                difficulty,
-                hint,
-                explanation,
-            },
-        );
+    let questions = questions.into_inner();
+    if questions.len() < question_files.len() {
+        // Error already printed.
+        process::exit(1);
     }
 
     let json_object = serde_json::to_string_pretty(&questions)?;
     let javascript = format!("var questions = {};\n", json_object);
     fs::write("docs/questions.js", javascript)?;
+
+    Ok(())
+}
+
+fn worker(broker: &Broker, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question>>) {
+    loop {
+        let task = broker.begin();
+        let path = match files.get(task.index) {
+            Some(path) => path,
+            None => return,
+        };
+
+        writeln!(task, "evaluating {}", path.display());
+
+        if let Err(err) = work(path, out) {
+            write!(task, "ERROR: {}\n\n", err);
+        }
+    }
+}
+
+fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
+    let code = fs::read_to_string(path)?;
+
+    let Markdown {
+        answer,
+        difficulty,
+        hint,
+        explanation,
+    } = parse_markdown(path.with_extension("md"))?;
+
+    check_answer(path, &answer)?;
+
+    let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").unwrap();
+    let number = match re.captures(&path.to_str().unwrap()) {
+        Some(cap) => cap[1].parse::<u16>().unwrap(),
+        None => return Err(Error::FilenameFormat),
+    };
+
+    let mut map = out.lock();
+    map.insert(
+        number,
+        Question {
+            code,
+            answer,
+            difficulty,
+            hint,
+            explanation,
+        },
+    );
 
     Ok(())
 }
