@@ -130,7 +130,7 @@ var questions = {
     "difficulty": 1,
     "answer": "21",
     "hint": "<p>Does <code>s</code> get moved?</p>\n",
-    "explanation": "<p>The relevant line is <code>let _  = s</code>. If this line does not move <code>s</code> then <code>s</code> will\ncontinue to live until the close curly brace and the program would print <code>21</code>.\nBut if this line does move <code>s</code>, without binding it, then the moved value of type\n<code>S</code> would be dropped immediately and the program would print <code>12</code>.</p>\n<p>In fact <code>s</code> does not get moved and the output is <code>21</code>.</p>\n"
+    "explanation": "<p>The relevant line is <code>let _ = s</code>. If this line does not move <code>s</code> then <code>s</code> will\ncontinue to live until the close curly brace and the program would print <code>21</code>.\nBut if this line does move <code>s</code>, without binding it, then the moved value of type\n<code>S</code> would be dropped immediately and the program would print <code>12</code>.</p>\n<p>In fact <code>s</code> does not get moved and the output is <code>21</code>.</p>\n"
   },
   "20": {
     "code": "fn return1() {\n    if (return { print!(\"1\") }) {\n    }\n}\n\nfn return2() {\n    if return { print!(\"2\") } {\n    }\n}\n\nfn break1() {\n    loop {\n        if (break { print!(\"1\") }) {\n        }\n    }\n}\n\nfn break2() {\n    loop {\n        if break { print!(\"2\") } {\n        }\n    }\n}\n\nfn main() {\n    return1();\n    return2();\n    break1();\n    break2();\n}\n",
