@@ -8,7 +8,7 @@ publish = false
 [dependencies]
 num_cpus = "1.0"
 parking_lot = "0.7"
-pulldown-cmark = "0.2"
+pulldown-cmark = "0.4"
 rayon = "1.0"
 readonly = "0.1"
 regex = "1.0"
