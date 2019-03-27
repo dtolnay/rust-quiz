@@ -38,7 +38,7 @@ impl Display for Error {
                 f,
                 "{} does not match the expected format.\n{}",
                 path.display(),
-                super::MARKDOWN_FORMAT,
+                crate::render::MARKDOWN_FORMAT,
             ),
             Rayon(e) => write!(f, "{}", e),
             Rustc(e) => write!(f, "failed to execute rustc: {}", e),
