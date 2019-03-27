@@ -4,6 +4,8 @@ mod error;
 mod render;
 mod serve;
 
+use colored::Colorize;
+
 use std::env;
 use std::io::{self, Write};
 use std::process;
@@ -32,7 +34,13 @@ fn should_serve() -> bool {
 
 fn exec(f: fn() -> Result<()>) {
     if let Err(err) = f() {
-        let _ = writeln!(io::stderr(), "ERROR: {}", err);
+        let _ = writeln!(
+            io::stderr(),
+            "{error}{colon} {message}",
+            error = "ERROR".bold().red(),
+            colon = ":".bold(),
+            message = err.to_string().bold(),
+        );
         process::exit(1);
     }
 }

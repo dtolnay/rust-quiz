@@ -3,6 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
 
+use colored::Colorize;
 use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
 use rayon::ThreadPoolBuilder;
@@ -97,7 +98,13 @@ fn worker(broker: &Broker, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question
         writeln!(task, "evaluating {}", path.display());
 
         if let Err(err) = work(path, out) {
-            write!(task, "ERROR: {}\n\n", err);
+            write!(
+                task,
+                "{error}{colon} {message}\n\n",
+                error = "ERROR".bold().red(),
+                colon = ":".bold(),
+                message = err.to_string().bold(),
+            );
         }
     }
 }
