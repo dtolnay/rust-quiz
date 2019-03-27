@@ -61,11 +61,9 @@ To launch the site locally and preview your rendered Markdown, run the
 following inside this directory.
 
 ```bash
-# Package all the questions into a single JavaScript file.
-cargo run
-
-# Start up a static file server.
-python -m SimpleHTTPServer
+# Package all the questions into a single JavaScript file
+# and serve website over http at localhost:8000.
+cargo run -- serve
 ```
 
 Then your question, assuming you numbered it 000, will be accessible at

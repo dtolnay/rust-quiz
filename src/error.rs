@@ -9,6 +9,7 @@ use rayon::ThreadPoolBuildError;
 pub enum Error {
     Execute(io::Error),
     FilenameFormat,
+    Hyper(hyper::Error),
     Io(io::Error),
     Json(serde_json::Error),
     MarkdownFormat(PathBuf),
@@ -32,6 +33,7 @@ impl Display for Error {
         match self {
             Execute(e) => write!(f, "failed to execute quiz question: {}", e),
             FilenameFormat => write!(f, "wrong filename format"),
+            Hyper(e) => write!(f, "{}", e),
             Io(e) => write!(f, "{}", e),
             Json(e) => write!(f, "{}", e),
             MarkdownFormat(path) => write!(
@@ -70,5 +72,11 @@ impl From<serde_json::Error> for Error {
 impl From<FromUtf8Error> for Error {
     fn from(err: FromUtf8Error) -> Self {
         Error::Utf8(err)
+    }
+}
+
+impl From<hyper::Error> for Error {
+    fn from(err: hyper::Error) -> Self {
+        Error::Hyper(err)
     }
 }

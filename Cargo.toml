@@ -6,6 +6,10 @@ edition = "2018"
 publish = false
 
 [dependencies]
+futures = "0.1"
+http = "0.1"
+hyper = "0.12"
+hyper-staticfile = "0.3"
 num_cpus = "1.0"
 parking_lot = "0.7"
 pulldown-cmark = "0.4"
