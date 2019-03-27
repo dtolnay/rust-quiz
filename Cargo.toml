@@ -1,6 +1,6 @@
 [package]
 name = "rust-quiz"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 edition = "2018"
 license = "CC-BY-SA-4.0"
