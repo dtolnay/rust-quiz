@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
 
 use parking_lot::Mutex;
+use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
 use rayon::ThreadPoolBuilder;
 use regex::Regex;
 use serde::Serialize;
@@ -158,9 +159,9 @@ fn parse_markdown(path: PathBuf) -> Result<Markdown> {
 }
 
 fn render_to_html(markdown: &str) -> String {
-    let parser = pulldown_cmark::Parser::new(markdown);
+    let parser = MarkdownParser::new(markdown);
     let mut html = String::new();
-    pulldown_cmark::html::push_html(&mut html, parser);
+    markdown_html::push_html(&mut html, parser);
     html = html.replace("<a href=\"", "<a target=\"_blank\" href=\"");
     html
 }
