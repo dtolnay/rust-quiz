@@ -8,6 +8,7 @@ description = "Medium to hard Rust questions with complete explanations"
 homepage = "https://dtolnay.github.io/rust-quiz"
 repository = "https://github.com/dtolnay/rust-quiz"
 readme = "README.md"
+exclude = ["rust-quiz"]
 publish = false
 
 [dependencies]
