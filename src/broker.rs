@@ -1,9 +1,7 @@
 use std::fmt;
 use std::io::{self, Write as _};
-use std::ops::Deref;
 
 use parking_lot::Mutex;
-use ref_cast::RefCast;
 
 use crate::ahead::AheadQueue;
 
@@ -88,9 +86,11 @@ impl Default for Task {
     }
 }
 
+#[readonly::make]
 pub struct Handle<'a> {
     broker: &'a Broker,
-    index: usize,
+    #[readonly]
+    pub index: usize,
 }
 
 impl<'a> Handle<'a> {
@@ -112,18 +112,4 @@ impl<'a> Drop for Handle<'a> {
         inner.pending.get(self.index).done = true;
         inner.catch_up();
     }
-}
-
-impl<'a> Deref for Handle<'a> {
-    type Target = HasIndex;
-
-    fn deref(&self) -> &Self::Target {
-        HasIndex::ref_cast(&self.index)
-    }
-}
-
-#[derive(RefCast)]
-#[repr(transparent)]
-pub struct HasIndex {
-    pub index: usize,
 }
