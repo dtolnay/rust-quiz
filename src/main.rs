@@ -4,7 +4,7 @@ mod error;
 mod render;
 mod serve;
 
-use colored::Colorize;
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 use std::env;
 use std::io::{self, Write};
@@ -34,13 +34,12 @@ fn should_serve() -> bool {
 
 fn exec(f: fn() -> Result<()>) {
     if let Err(err) = f() {
-        let _ = writeln!(
-            io::stderr(),
-            "{error}{colon} {message}",
-            error = "ERROR".bold().red(),
-            colon = ":".bold(),
-            message = err.to_string().bold(),
-        );
+        let mut stderr = StandardStream::stderr(ColorChoice::Auto);
+        let _ = stderr.set_color(ColorSpec::new().set_bold(true).set_fg(Some(Color::Red)));
+        let _ = write!(stderr, "ERROR");
+        let _ = stderr.set_color(ColorSpec::new().set_bold(true));
+        let _ = writeln!(stderr, ": {}", err);
+        let _ = stderr.reset();
         process::exit(1);
     }
 }

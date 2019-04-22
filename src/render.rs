@@ -3,12 +3,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
 
-use colored::Colorize;
 use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
 use rayon::ThreadPoolBuilder;
 use regex::Regex;
 use serde::Serialize;
+use termcolor::{Color, ColorSpec, WriteColor};
 
 use crate::broker::Broker;
 use crate::error::{Error, Result};
@@ -89,7 +89,7 @@ pub fn main() -> Result<()> {
 
 fn worker(broker: &Broker, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question>>) {
     loop {
-        let task = broker.begin();
+        let mut task = broker.begin();
         let path = match files.get(task.index) {
             Some(path) => path,
             None => return,
@@ -98,13 +98,11 @@ fn worker(broker: &Broker, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question
         writeln!(task, "evaluating {}", path.display());
 
         if let Err(err) = work(path, out) {
-            write!(
-                task,
-                "{error}{colon} {message}\n\n",
-                error = "ERROR".bold().red(),
-                colon = ":".bold(),
-                message = err.to_string().bold(),
-            );
+            let _ = task.set_color(ColorSpec::new().set_bold(true).set_fg(Some(Color::Red)));
+            write!(task, "ERROR");
+            let _ = task.set_color(ColorSpec::new().set_bold(true));
+            writeln!(task, ": {}", err);
+            let _ = task.reset();
         }
     }
 }

@@ -1,7 +1,8 @@
 use std::fmt;
-use std::io::{self, Write as _};
+use std::io::{self, Write};
 
 use parking_lot::Mutex;
+use termcolor::{Buffer, BufferWriter, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 use crate::ahead::AheadQueue;
 
@@ -34,7 +35,7 @@ struct Inner {
 }
 
 struct Task {
-    output: Vec<u8>,
+    output: Buffer,
     done: bool,
 }
 
@@ -63,16 +64,15 @@ impl Broker {
 
 impl Inner {
     fn catch_up(&mut self) {
-        let stderr = io::stderr();
-        let mut stderr = stderr.lock();
+        let stderr = BufferWriter::stderr(ColorChoice::Auto);
 
         while self.pending.front().done {
             let task = self.pending.pop();
-            let _ = stderr.write_all(&task.output);
+            let _ = stderr.print(&task.output);
         }
 
         let head = self.pending.front();
-        let _ = stderr.write_all(&head.output);
+        let _ = stderr.print(&head.output);
         head.output.clear();
     }
 }
@@ -80,7 +80,7 @@ impl Inner {
 impl Default for Task {
     fn default() -> Self {
         Task {
-            output: Vec::new(),
+            output: BufferWriter::stderr(ColorChoice::Auto).buffer(),
             done: false,
         }
     }
@@ -95,13 +95,49 @@ pub struct Handle<'a> {
 
 impl<'a> Handle<'a> {
     pub fn write_fmt(&self, args: fmt::Arguments) {
+        let _ = self.apply(|w| w.write_fmt(args));
+    }
+
+    fn apply<T>(&self, f: impl FnOnce(&mut dyn WriteColor) -> T) -> T {
         let mut inner = self.broker.inner.lock();
 
         if self.index == inner.pending.offset() {
-            let _ = io::stderr().write_fmt(args);
+            f(&mut StandardStream::stderr(ColorChoice::Auto))
         } else {
-            let _ = inner.pending.get(self.index).output.write_fmt(args);
+            f(&mut inner.pending.get(self.index).output)
         }
+    }
+}
+
+impl<'a> Write for Handle<'a> {
+    fn write(&mut self, b: &[u8]) -> io::Result<usize> {
+        self.apply(|w| w.write(b))
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.apply(|w| w.flush())
+    }
+
+    fn write_all(&mut self, buf: &[u8]) -> io::Result<()> {
+        self.apply(|w| w.write_all(buf))
+    }
+
+    fn write_fmt(&mut self, args: fmt::Arguments) -> io::Result<()> {
+        self.apply(|w| w.write_fmt(args))
+    }
+}
+
+impl<'a> WriteColor for Handle<'a> {
+    fn supports_color(&self) -> bool {
+        self.apply(|w| w.supports_color())
+    }
+
+    fn set_color(&mut self, spec: &ColorSpec) -> io::Result<()> {
+        self.apply(|w| w.set_color(spec))
+    }
+
+    fn reset(&mut self) -> io::Result<()> {
+        self.apply(|w| w.reset())
     }
 }
 
