@@ -1,10 +1,8 @@
-mod ahead;
-mod broker;
 mod error;
 mod render;
 mod serve;
 
-use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use oqueue::{Color::Red, Sequencer};
 
 use std::env;
 use std::io::{self, Write};
@@ -34,12 +32,12 @@ fn should_serve() -> bool {
 
 fn exec(f: fn() -> Result<()>) {
     if let Err(err) = f() {
-        let mut stderr = StandardStream::stderr(ColorChoice::Auto);
-        let _ = stderr.set_color(ColorSpec::new().set_bold(true).set_fg(Some(Color::Red)));
-        let _ = write!(stderr, "ERROR");
-        let _ = stderr.set_color(ColorSpec::new().set_bold(true));
-        let _ = writeln!(stderr, ": {}", err);
-        let _ = stderr.reset();
+        let task = Sequencer::stderr().begin();
+        task.bold_color(Red);
+        write!(task, "ERROR");
+        task.bold();
+        writeln!(task, ": {}", err);
+        task.reset_color();
         process::exit(1);
     }
 }

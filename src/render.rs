@@ -3,14 +3,13 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
 
+use oqueue::{Color::Red, Sequencer};
 use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
 use rayon::ThreadPoolBuilder;
 use regex::Regex;
 use serde::Serialize;
-use termcolor::{Color, ColorSpec, WriteColor};
 
-use crate::broker::Broker;
 use crate::error::{Error, Result};
 
 #[derive(Serialize)]
@@ -66,11 +65,11 @@ pub fn main() -> Result<()> {
         .build()
         .map_err(Error::Rayon)?;
 
-    let broker = Broker::new();
+    let oqueue = Sequencer::stderr();
     let questions = Mutex::new(BTreeMap::new());
     pool.scope(|scope| {
         for _ in 0..cpus {
-            scope.spawn(|_| worker(&broker, &question_files, &questions));
+            scope.spawn(|_| worker(&oqueue, &question_files, &questions));
         }
     });
 
@@ -87,9 +86,9 @@ pub fn main() -> Result<()> {
     Ok(())
 }
 
-fn worker(broker: &Broker, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question>>) {
+fn worker(oqueue: &Sequencer, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question>>) {
     loop {
-        let mut task = broker.begin();
+        let task = oqueue.begin();
         let path = match files.get(task.index) {
             Some(path) => path,
             None => return,
@@ -98,11 +97,10 @@ fn worker(broker: &Broker, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question
         writeln!(task, "evaluating {}", path.display());
 
         if let Err(err) = work(path, out) {
-            let _ = task.set_color(ColorSpec::new().set_bold(true).set_fg(Some(Color::Red)));
+            task.bold_color(Red);
             write!(task, "ERROR");
-            let _ = task.set_color(ColorSpec::new().set_bold(true));
+            task.bold();
             writeln!(task, ": {}", err);
-            let _ = task.reset();
         }
     }
 }
