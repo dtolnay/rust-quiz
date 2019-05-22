@@ -21,8 +21,6 @@ We want to know whether each possible parenthesization of `return || true;` and
     fill in for any type, in this case bool. The expression `! || true` is a
     logical-OR with bool on both the left-hand side and right-hand side.
 
-    [never]: https://doc.rust-lang.org/std/primitive.never.html
-
     The behavior of `!` of filling in for any type is what allows us to write:
 
     ```rust
@@ -33,6 +31,8 @@ We want to know whether each possible parenthesization of `return || true;` and
 
     in which the type of `unimplemented!()`, since it panics without evaluating
     to any value, is also `!`.
+
+    [never]: https://doc.rust-lang.org/std/primitive.never.html
 
 - `let x = loop { (break) || true; };`
 
