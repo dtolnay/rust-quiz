@@ -39,4 +39,4 @@ The signature `fn f<'a>()` has a late bound lifetime parameter while the
 signature `fn g<'a: 'a>()` has an early bound lifetime parameter.
 
 As far as I know, for most purposes `f` and `g` are interchangeable except that
-`f` cannot be given explitic lifetime arguments via turbofish.
+`f` cannot be given explicit lifetime arguments via turbofish.
