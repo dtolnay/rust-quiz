@@ -19,5 +19,5 @@ only integral and 1-tuple types with an implementation for `Trait`.
 
 Since `(0, 0)` and `(0, 0,)` have the same type, the output of their `p` methods
 must be the same, but Rust needs to somehow choose between the two possible
-implementatoins of `Trait`, namely `(i32, i32)` and `(u32, u32)`. Since `i32` is
+implementations of `Trait`, namely `(i32, i32)` and `(u32, u32)`. Since `i32` is
 the default integral type, `(i32, i32)` is chosen in both cases.
