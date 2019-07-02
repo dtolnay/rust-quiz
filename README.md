@@ -51,6 +51,9 @@ Refer to an existing *.md* file and copy the format. In particular, you will
 need to provide a correct answer on the first line, a difficulty rating (1, 2 or
 3) on the second line, a **Hint** section, and an **Explanation** section.
 
+The difficulty rating should primarily reflect how obscure is the knowledge
+required to confidently solve the question.
+
 When writing a hint, keep it brief. Maximum three lines, maximum two sentences
 is ideal.
 
