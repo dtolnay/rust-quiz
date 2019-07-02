@@ -35,6 +35,12 @@ answer, and explanation of the answer.
 The best questions are drawn from personal experience writing or reading Rust
 code and being bewildered by its behavior.
 
+Aim for no more than 25 lines including blank lines, but shorter than that is
+better. Questions up to 35 lines may be accepted if there is no possible way to
+frame the same idea more concisely. Aim for no wider than 40 columns. The only
+exceptions on width will be for obvious boilerplate that is not necessary to
+read for solving the question.
+
 The website shows choices for "undefined behavior" and "does not compile", but
 please prefer adding questions that do compile and are well-defined.
 
