@@ -8,7 +8,7 @@ impl Trait for (u32) {
     }
 }
 
-impl Trait for (u32,) {
+impl Trait for (i32,) {
     fn p(&self) {
         print!("2");
     }
