@@ -2,8 +2,8 @@ use std::rc::Rc;
 
 struct A;
 
-fn d<T>(t: T) {
-    match std::mem::size_of_val(&t) {
+fn p<X>(x: X) {
+    match std::mem::size_of::<X>() {
         0 => print!("0"),
         _ => print!("1"),
     }
@@ -11,14 +11,14 @@ fn d<T>(t: T) {
 
 fn main() {
     let a = &A;
-    d(a);
-    d(a.clone());
+    p(a);
+    p(a.clone());
     
     let b = &();
-    d(b);
-    d(b.clone());
+    p(b);
+    p(b.clone());
     
     let c = Rc::new(());
-    d(Rc::clone(&c));
-    d(c.clone());
+    p(Rc::clone(&c));
+    p(c.clone());
 }
