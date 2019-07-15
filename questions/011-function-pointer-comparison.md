@@ -39,8 +39,8 @@ type has an unresolved type parameter. For example:
 fn m<T>() {}
 
 fn main() {
-  let m1 = m::<u8>; // ok
-  let m2 = m; // error: cannot infer type for `T`
+    let m1 = m::<u8>; // ok
+    let m2 = m; // error: cannot infer type for `T`
 }
 ```
 
@@ -50,7 +50,7 @@ However, this is often allowed for lifetime parameters:
 fn m<'a>(_: &'a ()) {}
 
 fn main() {
-  let m1 = m; // ok even though 'a isn't provided
+    let m1 = m; // ok even though 'a isn't provided
 }
 ```
 
