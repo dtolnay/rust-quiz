@@ -94,19 +94,28 @@ let m1: impl for<'r> Fn(&'r ()) = m;
 You can think of this as meaning: "There is a lifetime but it we don't need to
 know what it is just yet".
 
-Lifetimes on _data types_ are always early bound, unless the developer has
+Late bound lifetimes are always unbounded; there is no syntax for expressing a
+late bound lifetime that must outlive some other lifetime.
+
+```
+error: lifetime bounds cannot be used in this context
+ --> src/main.rs:5:20
+  |
+5 |     let _: for<'b: 'a> fn(&'b ());
+  |                    ^^
+```
+
+Lifetimes on _data types_ are always early bound except when the developer has
 explicitly used the HRTB `for` syntax. On _functions_, lifetimes are late bound
-by default, but can be early bound if:
+by default but can be early bound if:
 
-* The lifetime is declared outside the function signature, e.g. in a struct
-  method it could be from the struct itself.
-* The lifetime is not constrained by the function signature. An example of a
-  constraint is that the lifetime is used in the type of an argument or return
-  type. This is because having no constraints implies that the lifetime is
-  _irrelevant_ to the function.
+* The lifetime is declared outside the function signature, e.g. in an associated
+  method of a struct it could be from the struct itself; or
 
-The signature `fn f<'a>()` has an early bound lifetime parameter because the
-lifetime `'a` is not used and therefore it doesn't matter what it is. The
-signature `fn g<'a: 'a>()` has a late bound lifetime parameter because it is
-constrained — even though the constraint is also pointless. This is perhaps a
-quirk of the current implementation, but there it is.
+* The lifetime parameter is bounded below by some other lifetime that it must
+  outlive. As we've seen, this constraint is not expressible in the HRTB that
+  would be involved in late binding the lifetime.
+
+By these rules, the signature `fn f<'a>()` has a late bound lifetime parameter
+while the signature `fn g<'a: 'a>()` has an early bound lifetime parameter —
+even though the constraint here is ineffectual.
