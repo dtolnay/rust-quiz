@@ -32,7 +32,7 @@ note: the late bound lifetime parameter is introduced here
 ```
 
 Generic parameters can be either early bound or late bound. Currently (and for
-the forseeable future) type parameters are always early bound, but lifetime
+the foreseeable future) type parameters are always early bound, but lifetime
 parameters can be either early or late bound.
 
 Early bound parameters are determined by the compiler during monomorphization.
