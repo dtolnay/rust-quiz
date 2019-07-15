@@ -119,3 +119,8 @@ by default but can be early bound if:
 By these rules, the signature `fn f<'a>()` has a late bound lifetime parameter
 while the signature `fn g<'a: 'a>()` has an early bound lifetime parameter —
 even though the constraint here is ineffectual.
+
+Ordinarily these distinctions are compiler-internal terminology that Rust
+programmers are not intended to know about or think about in everyday code.
+There are only a few edge cases where this aspect of the type system becomes
+observable in the surface language, such as in the original quiz code.
