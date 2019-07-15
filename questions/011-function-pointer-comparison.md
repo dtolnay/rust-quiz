@@ -43,6 +43,7 @@ fn main() {
   let m2 = m; // error: cannot infer type for `T`
 }
 ```
+
 However, this is often allowed for lifetime parameters:
 
 ```
@@ -58,7 +59,7 @@ allowed to omit the lifetime parameter and it will be determined at the call
 site. The lifetime can even be different for each time it gets called.
 
 For this reason, we cannot specify the lifetime on this function until it is
-called: 
+called:
 
 ```
 // error: cannot specify lifetime arguments explicitly if late bound lifetime parameters are present
@@ -85,6 +86,7 @@ the type of `m1` above, we could have written:
 ```
 let m1: for<'r> fn(&'r ()) = m;
 ```
+
 You can think of this as meaning: "There is a lifetime but it we don't need to
 know what it is just yet".
 
@@ -95,7 +97,7 @@ by default, but can be early bound if:
 * The lifetime is declared outside the function signature, e.g. in a struct
   method it could be from the struct itself.
 * The lifetime is not constrained by the function signature. An example of a
-  constraint is that the lifetime is used in the type of an argument or return 
+  constraint is that the lifetime is used in the type of an argument or return
   type. This is because having no constraints implies that the lifetime is
   _irrelevant_ to the function.
 
