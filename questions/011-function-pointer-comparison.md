@@ -25,6 +25,10 @@ error: cannot specify lifetime arguments explicitly if late bound lifetime param
   |                  ^^^^^^^
   |
 note: the late bound lifetime parameter is introduced here
+ --> questions/011.rs:1:18
+  |
+1 | fn f<'a>() {}
+  |      ^^
 ```
 
 Generic parameters can be either early bound or late bound. Currently (and for
