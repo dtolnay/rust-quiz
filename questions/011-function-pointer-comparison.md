@@ -84,7 +84,7 @@ The syntax to express a HRTB for lifetimes uses the `for` keyword. To express
 the type of `m1` above, we could have written:
 
 ```
-let m1: for<'r> fn(&'r ()) = m;
+let m1: impl for<'r> Fn(&'r ()) = m;
 ```
 
 You can think of this as meaning: "There is a lifetime but it we don't need to
