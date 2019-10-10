@@ -91,7 +91,7 @@ the type of `m1` above, we could have written:
 let m1: impl for<'r> Fn(&'r ()) = m;
 ```
 
-You can think of this as meaning: "There is a lifetime but it we don't need to
+You can think of this as meaning: "There is a lifetime but we don't need to
 know what it is just yet".
 
 Late bound lifetimes are always unbounded; there is no syntax for expressing a
