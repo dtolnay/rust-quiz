@@ -1,16 +1,14 @@
-use std::collections::BTreeMap;
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::process::{self, Command, Stdio};
-
+use crate::error::{Error, Result};
 use oqueue::{Color::Red, Sequencer};
 use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
 use rayon::ThreadPoolBuilder;
 use regex::Regex;
 use serde::Serialize;
-
-use crate::error::{Error, Result};
+use std::collections::BTreeMap;
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::process::{self, Command, Stdio};
 
 #[derive(Serialize)]
 struct Question {

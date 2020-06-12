@@ -1,14 +1,12 @@
+use crate::error::Result;
 use futures::{future, Async, Future, Poll};
 use http::response::Builder as ResponseBuilder;
 use http::{header, Request, Response, StatusCode};
 use hyper::Body;
 use hyper_staticfile::{Static, StaticFuture};
-
 use std::io::{self, Error, Write};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::Path;
-
-use crate::error::Result;
 
 const PORT: u16 = 8000;
 

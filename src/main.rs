@@ -2,13 +2,11 @@ mod error;
 mod render;
 mod serve;
 
+use crate::error::Result;
 use oqueue::{Color::Red, Sequencer};
-
 use std::env;
 use std::io::{self, Write};
 use std::process;
-
-use crate::error::Result;
 
 fn should_serve() -> bool {
     let mut args = env::args_os().skip(1);

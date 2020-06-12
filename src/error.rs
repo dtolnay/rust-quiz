@@ -1,9 +1,8 @@
+use rayon::ThreadPoolBuildError;
 use std::fmt::{self, Display};
 use std::io;
 use std::path::PathBuf;
 use std::string::FromUtf8Error;
-
-use rayon::ThreadPoolBuildError;
 
 #[remain::sorted]
 pub enum Error {
