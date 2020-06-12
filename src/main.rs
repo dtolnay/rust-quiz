@@ -2,7 +2,7 @@ mod error;
 mod render;
 mod serve;
 
-use crate::error::Result;
+use crate::error::{Error, Result};
 use oqueue::{Color::Red, Sequencer};
 use std::env;
 use std::io::{self, Write};
@@ -28,8 +28,8 @@ fn should_serve() -> bool {
     }
 }
 
-fn exec(f: fn() -> Result<()>) {
-    if let Err(err) = f() {
+fn report(result: Result<()>) {
+    if let Err(err) = result {
         let task = Sequencer::stderr().begin();
         task.bold_color(Red);
         write!(task, "ERROR");
@@ -40,11 +40,12 @@ fn exec(f: fn() -> Result<()>) {
     }
 }
 
-fn main() {
-    exec(render::main);
+#[tokio::main]
+async fn main() {
+    report(render::main());
 
     if should_serve() {
         let _ = writeln!(io::stderr());
-        exec(serve::main);
+        report(serve::main().await);
     }
 }

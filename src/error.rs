@@ -16,6 +16,9 @@ pub enum Error {
     FilenameFormat,
 
     #[error(transparent)]
+    Http(#[from] http::Error),
+
+    #[error(transparent)]
     Hyper(#[from] hyper::Error),
 
     #[error(transparent)]
