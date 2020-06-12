@@ -1,81 +1,53 @@
 use rayon::ThreadPoolBuildError;
-use std::fmt::{self, Display};
 use std::io;
 use std::path::PathBuf;
 use std::string::FromUtf8Error;
-
-#[remain::sorted]
-pub enum Error {
-    Execute(io::Error),
-    FilenameFormat,
-    Hyper(hyper::Error),
-    Io(io::Error),
-    Json(serde_json::Error),
-    MarkdownFormat(PathBuf),
-    Rayon(ThreadPoolBuildError),
-    Rustc(io::Error),
-    ShouldCompile,
-    ShouldNotCompile,
-    UndefinedShouldCompile,
-    Utf8(FromUtf8Error),
-    WrongOutput { expected: String, output: String },
-}
+use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-impl Display for Error {
-    #[remain::check]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::Error::*;
+#[remain::sorted]
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("failed to execute quiz question: {0}")]
+    Execute(io::Error),
 
-        #[sorted]
-        match self {
-            Execute(e) => write!(f, "failed to execute quiz question: {}", e),
-            FilenameFormat => write!(f, "wrong filename format"),
-            Hyper(e) => write!(f, "{}", e),
-            Io(e) => write!(f, "{}", e),
-            Json(e) => write!(f, "{}", e),
-            MarkdownFormat(path) => write!(
-                f,
-                "{} does not match the expected format.\n{}",
-                path.display(),
-                crate::render::MARKDOWN_FORMAT,
-            ),
-            Rayon(e) => write!(f, "{}", e),
-            Rustc(e) => write!(f, "failed to execute rustc: {}", e),
-            ShouldCompile => write!(f, "program failed to compile"),
-            ShouldNotCompile => write!(f, "program should fail to compile"),
-            UndefinedShouldCompile => write!(f, "program with undefined behavior should compile"),
-            Utf8(e) => write!(f, "{}", e),
-            WrongOutput { expected, output } => write!(
-                f,
-                "wrong output! expected: {}, actual: {}",
-                expected, output
-            ),
-        }
-    }
-}
+    #[error("wrong filename format")]
+    FilenameFormat,
 
-impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Self {
-        Error::Io(err)
-    }
-}
+    #[error(transparent)]
+    Hyper(#[from] hyper::Error),
 
-impl From<serde_json::Error> for Error {
-    fn from(err: serde_json::Error) -> Self {
-        Error::Json(err)
-    }
-}
+    #[error(transparent)]
+    Io(#[from] io::Error),
 
-impl From<FromUtf8Error> for Error {
-    fn from(err: FromUtf8Error) -> Self {
-        Error::Utf8(err)
-    }
-}
+    #[error(transparent)]
+    Json(#[from] serde_json::Error),
 
-impl From<hyper::Error> for Error {
-    fn from(err: hyper::Error) -> Self {
-        Error::Hyper(err)
-    }
+    #[error(
+        "{0} does not match the expected format.\n{}",
+        crate::render::MARKDOWN_FORMAT
+    )]
+    MarkdownFormat(PathBuf),
+
+    #[error(transparent)]
+    Rayon(ThreadPoolBuildError),
+
+    #[error("failed to execute rustc: {0}")]
+    Rustc(io::Error),
+
+    #[error("program failed to compile")]
+    ShouldCompile,
+
+    #[error("program should fail to compile")]
+    ShouldNotCompile,
+
+    #[error("program with undefined behavior should compile")]
+    UndefinedShouldCompile,
+
+    #[error(transparent)]
+    Utf8(#[from] FromUtf8Error),
+
+    #[error("wrong output! expected: {expected}, actual: {output}")]
+    WrongOutput { expected: String, output: String },
 }
