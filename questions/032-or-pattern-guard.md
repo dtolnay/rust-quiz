@@ -13,7 +13,7 @@ This question covers two behaviors of `match` arms and guards.
 First, whether an `if` guard on a match-arm containing `|` applies to *all*
 alternatives in the match-arm or just to the one it is adjacent to. In the quiz
 code, does `check(x)` execute at all for `(x, _)` or does it only cover the `(_,
-x)` case? We would expect `1` would get printed if and only if the latter is the
+x)` case? We would expect `1` would get printed if and only if the former is the
 case. In fact `1` does get printed. A match-arm gets to have at most one `if`
 guard and that guard applies to all the `|`-separated alternatives in the arm.
 
