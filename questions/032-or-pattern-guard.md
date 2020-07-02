@@ -19,7 +19,7 @@ alternatives in the arm.
 
 The `match` expression is equivalent to:
 
-```
+```rust
 match (1, 2) {
     (x, _) if check(x) => print!("3"),
     (_, x) if check(x) => print!("3"),
