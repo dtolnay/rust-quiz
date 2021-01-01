@@ -15,7 +15,7 @@ publish = false
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["http1", "http2", "server", "tcp"] }
-hyper-staticfile = "0.5"
+hyper-staticfile = "0.6"
 num_cpus = "1.0"
 oqueue = "0.1"
 parking_lot = "0.11"
@@ -31,9 +31,3 @@ tokio = { version = "1.0", features = ["full", "macros"] }
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
-
-[patch.crates-io.hyper-staticfile]
-# Patch with hyper 0.14 and tokio 1.0 support
-# https://github.com/stephank/hyper-staticfile/pull/31
-git = "https://github.com/dtolnay-contrib/hyper-staticfile"
-branch = "up"
