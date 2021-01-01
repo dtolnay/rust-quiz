@@ -18,3 +18,11 @@ jobs:
           cargo run
           git checkout -- questions
           git diff --exit-code
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@clippy
+      - run: cargo clippy -- -Dclippy::all
