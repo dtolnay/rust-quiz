@@ -1,3 +1,5 @@
+#![allow(clippy::match_bool)]
+
 mod error;
 mod render;
 mod serve;
