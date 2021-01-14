@@ -21,6 +21,7 @@ jobs:
 
   clippy:
     name: Clippy
+    continue-on-error: true  # https://github.com/rust-lang/rust/issues/81000
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
