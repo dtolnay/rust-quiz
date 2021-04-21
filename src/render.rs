@@ -126,8 +126,8 @@ fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
         number,
         Question {
             code,
-            answer,
             difficulty,
+            answer,
             hint,
             explanation,
         },
