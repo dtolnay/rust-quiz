@@ -1,4 +1,4 @@
-#![allow(clippy::match_bool)]
+#![allow(clippy::let_underscore_drop, clippy::match_bool)]
 
 mod error;
 mod render;
