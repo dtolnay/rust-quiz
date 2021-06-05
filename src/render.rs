@@ -116,7 +116,7 @@ fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
     check_answer(path, &answer)?;
 
     let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
-    let number = match re.captures(&path.to_str().unwrap()) {
+    let number = match re.captures(path.to_str().unwrap()) {
         Some(cap) => cap[1].parse::<u16>().expect("three decimal digits"),
         None => return Err(Error::FilenameFormat),
     };
