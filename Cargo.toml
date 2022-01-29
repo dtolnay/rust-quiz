@@ -18,7 +18,7 @@ hyper = { version = "0.14", features = ["http1", "http2", "server", "tcp"] }
 hyper-staticfile = "0.8"
 num_cpus = "1.0"
 oqueue = "0.1"
-parking_lot = "0.11"
+parking_lot = "0.12"
 pin-project = "1.0"
 pulldown-cmark = "0.9"
 rayon = "1.0"
