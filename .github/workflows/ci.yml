@@ -22,6 +22,20 @@ jobs:
           git checkout -- questions
           git diff --exit-code
 
+  check:
+    name: Rust ${{matrix.rust}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [beta, stable]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{matrix.rust}}
+      - run: cargo check
+
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
