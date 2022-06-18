@@ -2,7 +2,7 @@
 name = "rust-quiz"
 version = "0.0.5"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "CC-BY-SA-4.0"
 description = "Medium to hard Rust questions with complete explanations"
 homepage = "https://dtolnay.github.io/rust-quiz"
