@@ -20,12 +20,9 @@ This distinction between the underscore pattern vs variables with a leading
 underscore is incredibly important to remember when working with lock guards in
 unsafe code.
 
-    use lazy_static::lazy_static;
     use std::sync::Mutex;
 
-    lazy_static! {
-        static ref MUTEX: Mutex<()> = Mutex::new(());
-    }
+    static MUTEX: Mutex<()> = Mutex::new(());
 
     /// MUTEX must be held when accessing this value.
     static mut VALUE: usize = 0;
