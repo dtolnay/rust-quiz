@@ -5,11 +5,12 @@
     clippy::nonstandard_macro_braces,
 )]
 
-mod error;
-mod render;
 mod serve;
 
-use crate::error::{Error, Result};
+use rust_quiz::error::{Error, Result};
+use rust_quiz::parser::ParseOption::RenderHtml;
+use rust_quiz::render::render_questions;
+
 use oqueue::{Color::Red, Sequencer};
 use std::env;
 use std::io::{self, Write};
@@ -49,10 +50,20 @@ fn report(result: Result<()>) {
 
 #[tokio::main]
 async fn main() {
-    report(render::main());
+    report(render_main());
 
     if should_serve() {
         let _ = writeln!(io::stderr());
         report(serve::main().await);
     }
+}
+
+fn render_main() -> Result<()> {
+    let questions = render_questions(RenderHtml)?;
+
+    let json_object = serde_json::to_string_pretty(&questions)?;
+    let javascript = format!("var questions = {};\n", json_object);
+    std::fs::write("docs/questions.js", javascript)?;
+
+    Ok(())
 }

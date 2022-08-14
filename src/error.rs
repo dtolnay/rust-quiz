@@ -1,6 +1,5 @@
 use rayon::ThreadPoolBuildError;
 use std::io;
-use std::path::PathBuf;
 use std::string::FromUtf8Error;
 use thiserror::Error;
 
@@ -29,9 +28,9 @@ pub enum Error {
 
     #[error(
         "{0} does not match the expected format.\n{}",
-        crate::render::MARKDOWN_FORMAT
+        crate::parser::MARKDOWN_FORMAT
     )]
-    MarkdownFormat(PathBuf),
+    MarkdownFormat(String),
 
     #[error(transparent)]
     Rayon(ThreadPoolBuildError),
