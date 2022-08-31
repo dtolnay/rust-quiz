@@ -26,7 +26,7 @@ fn should_serve() -> bool {
     if arg == "serve" {
         true
     } else {
-        let _ = writeln!(
+        _ = writeln!(
             io::stderr(),
             "Unrecognized argument: `{}`",
             arg.to_string_lossy()
@@ -52,7 +52,7 @@ async fn main() {
     report(render::main());
 
     if should_serve() {
-        let _ = writeln!(io::stderr());
+        _ = writeln!(io::stderr());
         report(serve::main().await);
     }
 }

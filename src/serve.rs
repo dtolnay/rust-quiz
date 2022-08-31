@@ -89,7 +89,7 @@ pub async fn main() -> crate::Result<()> {
     let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), PORT);
     let server = hyper::Server::try_bind(&addr)?.serve(MakeMainService);
 
-    let _ = writeln!(
+    _ = writeln!(
         io::stderr(),
         "Quiz server running on http://localhost:{}/ ...",
         PORT,
