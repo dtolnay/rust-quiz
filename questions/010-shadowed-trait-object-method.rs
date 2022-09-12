@@ -20,4 +20,5 @@ fn main() {
     <_ as Trait>::f(&true);
     <_ as Trait>::f(&true as &dyn Trait);
     <bool as Trait>::f(&true);
+    <dyn Trait as Trait>::f(&true as &dyn Trait);
 }
