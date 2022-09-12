@@ -1,5 +1,5 @@
 macro_rules! x {
-    ($n: expr) => {
+    ($n:expr) => {
         let a = X($n);
     };
 }
