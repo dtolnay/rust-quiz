@@ -1,4 +1,4 @@
-Answer: 22222
+Answer: 222222
 Difficulty: 2
 
 # Hint
@@ -54,4 +54,4 @@ note: candidate #2 is defined in the trait `Trait`
 
 Maybe some day it will be possible to disambiguate a call to an inherent method
 on a trait object shadowed by a trait method. For now, the quiz code prints
-`22222`.
+`222222`.
