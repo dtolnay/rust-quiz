@@ -1,8 +1,8 @@
-
-fn d<T>(_: T) {
+fn d<T>(_f: T) {
     match std::mem::size_of::<T>() {
-        n if n < 4 => print!("{}", n),
-        _ => print!("4"),
+        0 => print!("0"),
+        1 => print!("1"),
+        _ => print!("2"),
     }
 }
 
@@ -12,7 +12,5 @@ fn a<T>(f: fn(T)) {
 
 fn main() {
     a(a::<u8>);
-    a(a::<u16>);
-    d(a::<u32>);
-    d(a::<u64>);
+    d(a::<u8>);
 }

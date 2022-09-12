@@ -1,4 +1,4 @@
-Answer: 4400
+Answer: 20
 Difficulty: 2
 
 # Hint
