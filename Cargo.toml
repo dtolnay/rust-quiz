@@ -8,7 +8,6 @@ exclude = ["rust-quiz"]
 homepage = "https://dtolnay.github.io/rust-quiz"
 license = "CC-BY-SA-4.0"
 publish = false
-readme = "README.md"
 repository = "https://github.com/dtolnay/rust-quiz"
 
 [dependencies]
