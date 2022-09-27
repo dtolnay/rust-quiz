@@ -1,5 +1,6 @@
 Answer: 12
 Difficulty: 2
+Warnings: dead_code
 
 # Hint
 

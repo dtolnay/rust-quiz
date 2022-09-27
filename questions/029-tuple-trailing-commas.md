@@ -1,5 +1,6 @@
 Answer: 1244
 Difficulty: 1
+Warnings: unused_parens
 
 # Hint
 

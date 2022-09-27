@@ -1,5 +1,6 @@
 Answer: 0
 Difficulty: 1
+Warnings: unused_assignments, unused_variables
 
 # Hint
 

@@ -1,5 +1,6 @@
 Answer: 1
 Difficulty: 2
+Warnings: bindings_with_variant_name, dead_code, non_snake_case, unreachable_patterns, unused_variables
 
 # Hint
 

@@ -1,5 +1,6 @@
 Answer: 121
 Difficulty: 2
+Warnings: unreachable_code, unused_braces
 
 # Hint
 
