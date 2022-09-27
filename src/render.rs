@@ -7,6 +7,7 @@ use regex::Regex;
 use serde::Serialize;
 use std::collections::BTreeMap;
 use std::env;
+use std::env::consts::EXE_EXTENSION;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
@@ -201,9 +202,8 @@ fn check_answer(path: &Path, expected: &str) -> Result<()> {
 
 fn run(out_dir: &Path, path: &Path, expected: &str) -> Result<()> {
     let stem = path.file_stem().unwrap();
-    let output = Command::new(out_dir.join(stem))
-        .output()
-        .map_err(Error::Execute)?;
+    let exe = out_dir.join(stem).with_extension(EXE_EXTENSION);
+    let output = Command::new(exe).output().map_err(Error::Execute)?;
     let output = String::from_utf8(output.stdout)?;
 
     if output == expected {
