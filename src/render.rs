@@ -174,11 +174,13 @@ enum Status {
 }
 
 fn check_answer(path: &Path, expected: &str) -> Result<()> {
+    let out_dir = env::temp_dir().join("rust-quiz");
+
     let status = Command::new("rustc")
         .arg(path)
         .arg("--edition=2021")
         .arg("--out-dir")
-        .arg(env::temp_dir().join("rust-quiz"))
+        .arg(&out_dir)
         .stderr(Stdio::null())
         .status()
         .map_err(Error::Rustc)?;
@@ -193,13 +195,13 @@ fn check_answer(path: &Path, expected: &str) -> Result<()> {
         ("undefined", Status::Err) => Err(Error::UndefinedShouldCompile),
         ("error", Status::Ok) => Err(Error::ShouldNotCompile),
         (_, Status::Err) => Err(Error::ShouldCompile),
-        (_, Status::Ok) => run(path, expected),
+        (_, Status::Ok) => run(&out_dir, path, expected),
     }
 }
 
-fn run(path: &Path, expected: &str) -> Result<()> {
+fn run(out_dir: &Path, path: &Path, expected: &str) -> Result<()> {
     let stem = path.file_stem().unwrap().to_str().unwrap();
-    let output = Command::new(format!("/tmp/rust-quiz/{}", stem))
+    let output = Command::new(out_dir.join(stem))
         .output()
         .map_err(Error::Execute)?;
     let output = String::from_utf8(output.stdout)?;
