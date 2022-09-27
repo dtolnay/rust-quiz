@@ -24,7 +24,8 @@ struct Question {
 pub const MARKDOWN_REGEX: &str = r"(?msx)
     \AAnswer:\x20(?P<answer>undefined|error|[0-9]+)\n
     Difficulty:\x20(?P<difficulty>1|2|3)\n
-    \n
+    (?:Warnings:\x20(?P<warnings>[a-z_,\x20]+)\n
+    )?\n
     \x23\x20Hint\n
     \n
     (?P<hint>.*)
@@ -111,11 +112,12 @@ fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
     let Markdown {
         answer,
         difficulty,
+        warnings,
         hint,
         explanation,
     } = parse_markdown(path.with_extension("md"))?;
 
-    check_answer(path, &answer)?;
+    check_answer(path, &answer, &warnings)?;
 
     let re = Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
     let number = match re.captures(path.to_str().unwrap()) {
@@ -141,6 +143,7 @@ fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
 struct Markdown {
     answer: String,
     difficulty: u8,
+    warnings: Vec<String>,
     hint: String,
     explanation: String,
 }
@@ -153,9 +156,17 @@ fn parse_markdown(path: PathBuf) -> Result<Markdown> {
         None => return Err(Error::MarkdownFormat(path)),
     };
 
+    let mut warnings = Vec::new();
+    if let Some(regex_match) = cap.name("warnings") {
+        for word in regex_match.as_str().split(',') {
+            warnings.push(word.trim().to_owned());
+        }
+    }
+
     Ok(Markdown {
         answer: cap["answer"].to_owned(),
         difficulty: cap["difficulty"].parse().unwrap(),
+        warnings,
         hint: render_to_html(&cap["hint"]),
         explanation: render_to_html(&cap["explanation"]),
     })
@@ -174,18 +185,21 @@ enum Status {
     Err,
 }
 
-fn check_answer(path: &Path, expected: &str) -> Result<()> {
+fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<()> {
     let out_dir = env::temp_dir().join("rust-quiz");
 
-    let status = Command::new("rustc")
-        .arg(path)
+    let mut cmd = Command::new("rustc");
+    cmd.stderr(Stdio::null());
+    cmd.arg(path)
         .arg("--edition=2021")
         .arg("--out-dir")
         .arg(&out_dir)
-        .stderr(Stdio::null())
-        .status()
-        .map_err(Error::Rustc)?;
+        .arg("--deny=warnings");
+    for warning in warnings {
+        cmd.arg("--allow").arg(warning);
+    }
 
+    let status = cmd.status().map_err(Error::Rustc)?;
     let status = match status.success() {
         true => Status::Ok,
         false => Status::Err,

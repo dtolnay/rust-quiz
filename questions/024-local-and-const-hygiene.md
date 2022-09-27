@@ -1,5 +1,6 @@
 Answer: 14
 Difficulty: 1
+Warnings: dead_code, unused_variables
 
 # Hint
 

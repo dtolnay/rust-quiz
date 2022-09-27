@@ -1,5 +1,6 @@
 Answer: 32
 Difficulty: 1
+Warnings: const_item_mutation
 
 # Hint
 

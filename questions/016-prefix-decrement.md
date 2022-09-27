@@ -1,5 +1,6 @@
 Answer: 44
 Difficulty: 1
+Warnings: unused_must_use, unused_mut
 
 # Hint
 

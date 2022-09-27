@@ -1,5 +1,6 @@
 Answer: 112
 Difficulty: 2
+Warnings: coherence_leak_check
 
 # Hint
 
