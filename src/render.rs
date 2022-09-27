@@ -200,7 +200,7 @@ fn check_answer(path: &Path, expected: &str) -> Result<()> {
 }
 
 fn run(out_dir: &Path, path: &Path, expected: &str) -> Result<()> {
-    let stem = path.file_stem().unwrap().to_str().unwrap();
+    let stem = path.file_stem().unwrap();
     let output = Command::new(out_dir.join(stem))
         .output()
         .map_err(Error::Execute)?;
