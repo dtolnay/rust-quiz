@@ -21,16 +21,16 @@ struct Question {
 }
 
 pub const MARKDOWN_REGEX: &str = r"(?msx)
-    \AAnswer:\x20(undefined|error|[0-9]+)\n
-    Difficulty:\x20(1|2|3)\n
+    \AAnswer:\x20(?P<answer>undefined|error|[0-9]+)\n
+    Difficulty:\x20(?P<difficulty>1|2|3)\n
     \n
     \x23\x20Hint\n
     \n
-    (.*)
+    (?P<hint>.*)
     \n
     \x23\x20Explanation\n
     \n
-    (.*)
+    (?P<explanation>.*)
     \z
 ";
 
@@ -116,9 +116,9 @@ fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
 
     check_answer(path, &answer)?;
 
-    let re = Regex::new(r"questions/([0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
+    let re = Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
     let number = match re.captures(path.to_str().unwrap()) {
-        Some(cap) => cap[1].parse::<u16>().expect("three decimal digits"),
+        Some(cap) => cap["num"].parse::<u16>().expect("three decimal digits"),
         None => return Err(Error::FilenameFormat),
     };
 
@@ -153,10 +153,10 @@ fn parse_markdown(path: PathBuf) -> Result<Markdown> {
     };
 
     Ok(Markdown {
-        answer: cap[1].to_owned(),
-        difficulty: cap[2].parse().unwrap(),
-        hint: render_to_html(&cap[3]),
-        explanation: render_to_html(&cap[4]),
+        answer: cap["answer"].to_owned(),
+        difficulty: cap["difficulty"].parse().unwrap(),
+        hint: render_to_html(&cap["hint"]),
+        explanation: render_to_html(&cap["explanation"]),
     })
 }
 
