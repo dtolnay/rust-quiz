@@ -214,7 +214,7 @@ function showExplanation() {
         textOutput.value = questions[q].answer;
     }
     buttonPlayground.href =
-        "https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code="
+        "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&code="
         + encodeURIComponent(questions[q].code.trim());
     show(buttonPlayground);
     show(explanationAlert);
