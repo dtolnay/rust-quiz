@@ -188,13 +188,8 @@ enum Status {
 fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<()> {
     let out_dir = env::temp_dir().join("rust-quiz");
 
-    let mut cmd = Command::new("rustc");
-    cmd.stderr(Stdio::null());
-    cmd.arg(path)
-        .arg("--edition=2021")
-        .arg("--out-dir")
-        .arg(&out_dir)
-        .arg("--deny=warnings");
+    let mut cmd = rustc(&out_dir, path);
+    cmd.arg("--deny=warnings");
     for warning in warnings {
         cmd.arg("--allow").arg(warning);
     }
@@ -205,6 +200,17 @@ fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<()> 
         false => Status::Err,
     };
 
+    if let Status::Err = status {
+        if rustc(&out_dir, path)
+            .arg("--allow=warnings")
+            .status()
+            .map_err(Error::Rustc)?
+            .success()
+        {
+            return Err(Error::CompiledWithWarnings);
+        }
+    }
+
     match (expected, status) {
         ("undefined", Status::Ok) | ("error", Status::Err) => Ok(()),
         ("undefined", Status::Err) => Err(Error::UndefinedShouldCompile),
@@ -212,6 +218,16 @@ fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<()> 
         (_, Status::Err) => Err(Error::ShouldCompile),
         (_, Status::Ok) => run(&out_dir, path, expected),
     }
+}
+
+fn rustc(out_dir: &Path, path: &Path) -> Command {
+    let mut cmd = Command::new("rustc");
+    cmd.arg(path)
+        .arg("--edition=2021")
+        .arg("--out-dir")
+        .arg(out_dir)
+        .stderr(Stdio::null());
+    cmd
 }
 
 fn run(out_dir: &Path, path: &Path, expected: &str) -> Result<()> {
