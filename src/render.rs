@@ -6,6 +6,7 @@ use rayon::ThreadPoolBuilder;
 use regex::Regex;
 use serde::Serialize;
 use std::collections::BTreeMap;
+use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
@@ -176,7 +177,8 @@ fn check_answer(path: &Path, expected: &str) -> Result<()> {
     let status = Command::new("rustc")
         .arg(path)
         .arg("--edition=2021")
-        .arg("--out-dir=/tmp/rust-quiz")
+        .arg("--out-dir")
+        .arg(env::temp_dir().join("rust-quiz"))
         .stderr(Stdio::null())
         .status()
         .map_err(Error::Rustc)?;
