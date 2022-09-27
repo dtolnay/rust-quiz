@@ -1,9 +1,4 @@
-#![allow(
-    clippy::let_underscore_drop,
-    clippy::match_bool,
-    // Clippy bug: https://github.com/rust-lang/rust-clippy/issues/7422
-    clippy::nonstandard_macro_braces,
-)]
+#![allow(clippy::let_underscore_drop, clippy::match_bool)]
 
 mod error;
 mod render;
