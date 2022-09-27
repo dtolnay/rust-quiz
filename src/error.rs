@@ -1,4 +1,5 @@
 use rayon::ThreadPoolBuildError;
+use std::fmt::{self, Display};
 use std::io;
 use std::path::PathBuf;
 use std::string::FromUtf8Error;
@@ -36,7 +37,7 @@ pub enum Error {
     )]
     MarkdownFormat(PathBuf),
 
-    #[error("program compiled without expected warning: {0:?}")]
+    #[error("program compiled without expected warning: {}", CommaSep(.0))]
     MissingExpectedWarning(Vec<String>),
 
     #[error(transparent)]
@@ -59,4 +60,18 @@ pub enum Error {
 
     #[error("wrong output! expected: {expected}, actual: {output}")]
     WrongOutput { expected: String, output: String },
+}
+
+struct CommaSep<'a>(&'a [String]);
+
+impl<'a> Display for CommaSep<'a> {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        for (i, string) in self.0.iter().enumerate() {
+            if i > 0 {
+                formatter.write_str(", ")?;
+            }
+            formatter.write_str(string)?;
+        }
+        Ok(())
+    }
 }
