@@ -9,6 +9,9 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[remain::sorted]
 #[derive(Error, Debug)]
 pub enum Error {
+    #[error("program compiled with warnings; make sure every expected warning is listed in a 'Warnings:' section")]
+    CompiledWithWarnings,
+
     #[error("failed to execute quiz question: {0}")]
     Execute(io::Error),
 
