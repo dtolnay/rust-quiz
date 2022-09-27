@@ -36,6 +36,9 @@ pub enum Error {
     )]
     MarkdownFormat(PathBuf),
 
+    #[error("program compiled without expected warning: {0:?}")]
+    MissingExpectedWarning(Vec<String>),
+
     #[error(transparent)]
     Rayon(ThreadPoolBuildError),
 

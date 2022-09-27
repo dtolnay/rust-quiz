@@ -180,6 +180,7 @@ fn render_to_html(markdown: &str) -> String {
     html
 }
 
+#[derive(Copy, Clone)]
 enum Status {
     Ok,
     Err,
@@ -212,12 +213,33 @@ fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<()> 
     }
 
     match (expected, status) {
-        ("undefined", Status::Ok) | ("error", Status::Err) => Ok(()),
-        ("undefined", Status::Err) => Err(Error::UndefinedShouldCompile),
-        ("error", Status::Ok) => Err(Error::ShouldNotCompile),
-        (_, Status::Err) => Err(Error::ShouldCompile),
-        (_, Status::Ok) => run(&out_dir, path, expected),
+        ("undefined", Status::Ok) | ("error", Status::Err) => {}
+        ("undefined", Status::Err) => return Err(Error::UndefinedShouldCompile),
+        ("error", Status::Ok) => return Err(Error::ShouldNotCompile),
+        (_, Status::Err) => return Err(Error::ShouldCompile),
+        (_, Status::Ok) => run(&out_dir, path, expected)?,
     }
+
+    if let Status::Ok = status {
+        let mut missing_warnings = Vec::new();
+        for check_warning in warnings {
+            let mut cmd = rustc(&out_dir, path);
+            cmd.arg("--deny=warnings");
+            for warning in warnings {
+                if warning != check_warning {
+                    cmd.arg("--allow").arg(warning);
+                }
+            }
+            if cmd.status().map_err(Error::Rustc)?.success() {
+                missing_warnings.push(check_warning.clone());
+            }
+        }
+        if !missing_warnings.is_empty() {
+            return Err(Error::MissingExpectedWarning(missing_warnings));
+        }
+    }
+
+    Ok(())
 }
 
 fn rustc(out_dir: &Path, path: &Path) -> Command {
