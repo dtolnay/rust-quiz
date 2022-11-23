@@ -90,9 +90,8 @@ pub fn main() -> Result<()> {
 fn worker(oqueue: &Sequencer, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question>>) {
     loop {
         let task = oqueue.begin();
-        let path = match files.get(task.index) {
-            Some(path) => path,
-            None => return,
+        let Some(path) = files.get(task.index) else {
+            return;
         };
 
         writeln!(task, "evaluating {}", path.display());
@@ -151,9 +150,8 @@ struct Markdown {
 fn parse_markdown(path: PathBuf) -> Result<Markdown> {
     let content = fs::read_to_string(&path)?;
     let re = Regex::new(MARKDOWN_REGEX).expect("valid regex");
-    let cap = match re.captures(&content) {
-        Some(cap) => cap,
-        None => return Err(Error::MarkdownFormat(path)),
+    let Some(cap) = re.captures(&content) else {
+        return Err(Error::MarkdownFormat(path));
     };
 
     let mut warnings = Vec::new();

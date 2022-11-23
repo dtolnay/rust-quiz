@@ -17,9 +17,8 @@ use std::process;
 fn should_serve() -> bool {
     let mut args = env::args_os().skip(1);
 
-    let arg = match args.next() {
-        Some(arg) => arg,
-        None => return false,
+    let Some(arg) = args.next() else {
+        return false;
     };
 
     if arg == "serve" {
