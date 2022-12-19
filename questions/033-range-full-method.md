@@ -11,7 +11,7 @@ operations like `&s[1..4]` or `&s[..s.len() - 1]`.
 The two rational possibilities are `1` or `24`, depending on how the precedence
 of `|| .. .method()` is disambiguated.
 
-- As `|| ((..).method())`, which is a closure whose body invokes our impl of
+- As `|| (..).method()`, which is a closure whose body invokes our impl of
   `Trait` on `RangeFull`. In this case `main` would print `1`. It would *not*
   print `13` because the `fn()` returned from `(..).method()` is never invoked
   by `main`.
