@@ -1,4 +1,8 @@
-#![allow(clippy::match_bool, clippy::uninlined_format_args)]
+#![allow(
+    clippy::let_underscore_untyped,
+    clippy::match_bool,
+    clippy::uninlined_format_args
+)]
 
 mod error;
 mod render;
