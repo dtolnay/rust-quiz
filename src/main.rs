@@ -14,8 +14,17 @@ use oqueue::{Color::Red, Sequencer};
 use std::io::{self, Write};
 use std::process;
 
+const HELP: &str = "\
+{about}
+{author}
+
+{usage-heading} {usage}
+
+{all-args}\
+";
+
 #[derive(ClapParser, Debug)]
-#[command(about = "Rust Quiz", version, author)]
+#[command(about = "Rust Quiz", version, author, help_template = HELP)]
 struct Opt {
     #[clap(subcommand)]
     serve: Option<Subcommand>,
