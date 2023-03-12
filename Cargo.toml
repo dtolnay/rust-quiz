@@ -11,6 +11,7 @@ publish = false
 repository = "https://github.com/dtolnay/rust-quiz"
 
 [dependencies]
+clap = { version = "4", features = ["deprecated", "derive"] }
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["http1", "http2", "server", "tcp"] }
