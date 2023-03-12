@@ -24,7 +24,7 @@ const HELP: &str = "\
 ";
 
 #[derive(ClapParser, Debug)]
-#[command(about = "Rust Quiz", version, author, help_template = HELP)]
+#[command(about = "Rust Quiz", version, author, help_template = HELP, disable_help_subcommand = true)]
 struct Opt {
     #[clap(subcommand)]
     serve: Option<Subcommand>,
