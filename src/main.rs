@@ -33,7 +33,7 @@ const HELP: &str = "\
 )]
 struct Opt {
     #[clap(subcommand)]
-    serve: Option<Subcommand>,
+    subcommand: Option<Subcommand>,
 }
 
 #[derive(ClapSubcommand, Debug)]
@@ -60,9 +60,12 @@ async fn main() {
 
     report(render::main());
 
-    if opt.serve.is_some() {
-        let _ = writeln!(io::stderr());
-        report(serve::main().await);
+    match opt.subcommand {
+        None => {}
+        Some(Subcommand::Serve) => {
+            let _ = writeln!(io::stderr());
+            report(serve::main().await);
+        }
     }
 }
 
