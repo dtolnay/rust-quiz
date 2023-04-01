@@ -90,13 +90,13 @@ pub fn main() -> Result<(), Error> {
 fn worker(oqueue: &Sequencer, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Question>>) {
     loop {
         let task = oqueue.begin();
-        let Some(path) = files.get(task.index) else {
+        let Some(rs_path) = files.get(task.index) else {
             return;
         };
 
-        writeln!(task, "evaluating {}", path.display());
+        writeln!(task, "evaluating {}", rs_path.display());
 
-        if let Err(err) = work(path, out) {
+        if let Err(err) = work(rs_path, out) {
             task.bold_color(Red);
             write!(task, "ERROR");
             task.bold();
@@ -105,8 +105,8 @@ fn worker(oqueue: &Sequencer, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Quest
     }
 }
 
-fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Error> {
-    let code = fs::read_to_string(path)?;
+fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Error> {
+    let code = fs::read_to_string(rs_path)?;
 
     let Markdown {
         answer,
@@ -114,12 +114,12 @@ fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Error> 
         warnings,
         hint,
         explanation,
-    } = parse_markdown(path.with_extension("md"))?;
+    } = parse_markdown(rs_path.with_extension("md"))?;
 
-    check_answer(path, &answer, &warnings)?;
+    check_answer(rs_path, &answer, &warnings)?;
 
     let re = Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
-    let number = match re.captures(path.to_str().unwrap()) {
+    let number = match re.captures(rs_path.to_str().unwrap()) {
         Some(cap) => cap["num"].parse::<u16>().expect("three decimal digits"),
         None => return Err(Error::FilenameFormat),
     };
@@ -147,11 +147,11 @@ struct Markdown {
     explanation: String,
 }
 
-fn parse_markdown(path: PathBuf) -> Result<Markdown, Error> {
-    let content = fs::read_to_string(&path)?;
+fn parse_markdown(md_path: PathBuf) -> Result<Markdown, Error> {
+    let content = fs::read_to_string(&md_path)?;
     let re = Regex::new(MARKDOWN_REGEX).expect("valid regex");
     let Some(cap) = re.captures(&content) else {
-        return Err(Error::MarkdownFormat(path));
+        return Err(Error::MarkdownFormat(md_path));
     };
 
     let mut warnings = Vec::new();
@@ -184,10 +184,10 @@ enum Status {
     Err,
 }
 
-fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<(), Error> {
+fn check_answer(rs_path: &Path, expected: &str, warnings: &[String]) -> Result<(), Error> {
     let out_dir = env::temp_dir().join("rust-quiz");
 
-    let mut cmd = rustc(&out_dir, path);
+    let mut cmd = rustc(&out_dir, rs_path);
     cmd.arg("--deny=warnings");
     for warning in warnings {
         cmd.arg("--allow").arg(warning);
@@ -200,7 +200,7 @@ fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<(), 
     };
 
     if let Status::Err = status {
-        if rustc(&out_dir, path)
+        if rustc(&out_dir, rs_path)
             .arg("--allow=warnings")
             .status()
             .map_err(Error::Rustc)?
@@ -215,13 +215,13 @@ fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<(), 
         ("undefined", Status::Err) => return Err(Error::UndefinedShouldCompile),
         ("error", Status::Ok) => return Err(Error::ShouldNotCompile),
         (_, Status::Err) => return Err(Error::ShouldCompile),
-        (_, Status::Ok) => run(&out_dir, path, expected)?,
+        (_, Status::Ok) => run(&out_dir, rs_path, expected)?,
     }
 
     if let Status::Ok = status {
         let mut missing_warnings = Vec::new();
         for check_warning in warnings {
-            let mut cmd = rustc(&out_dir, path);
+            let mut cmd = rustc(&out_dir, rs_path);
             cmd.arg("--deny=warnings");
             for warning in warnings {
                 if warning != check_warning {
@@ -240,9 +240,9 @@ fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<(), 
     Ok(())
 }
 
-fn rustc(out_dir: &Path, path: &Path) -> Command {
+fn rustc(out_dir: &Path, rs_path: &Path) -> Command {
     let mut cmd = Command::new("rustc");
-    cmd.arg(path)
+    cmd.arg(rs_path)
         .arg("--edition=2021")
         .arg("--out-dir")
         .arg(out_dir)
@@ -250,8 +250,8 @@ fn rustc(out_dir: &Path, path: &Path) -> Command {
     cmd
 }
 
-fn run(out_dir: &Path, path: &Path, expected: &str) -> Result<(), Error> {
-    let stem = path.file_stem().unwrap();
+fn run(out_dir: &Path, rs_path: &Path, expected: &str) -> Result<(), Error> {
+    let stem = rs_path.file_stem().unwrap();
     let exe = out_dir.join(stem).with_extension(EXE_EXTENSION);
     let output = Command::new(exe).output().map_err(Error::Execute)?;
     let output = String::from_utf8(output.stdout)?;
