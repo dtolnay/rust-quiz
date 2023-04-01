@@ -7,8 +7,8 @@ enum Enum {
 impl Enum {
     fn p(self) {
         match self {
-            First => print!("1"),
-            Second => print!("2"),
+            Enum::First => print!("1"),
+            Enum::Second => print!("2"),
         }
     }
 }
