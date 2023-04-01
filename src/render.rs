@@ -1,4 +1,5 @@
 use crate::error::Error;
+use once_cell::sync::OnceCell;
 use oqueue::{Color::Red, Sequencer};
 use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
@@ -110,7 +111,10 @@ fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Erro
 
     let md_path = rs_path.with_extension("md");
     let md_content = fs::read_to_string(&md_path)?;
-    let markdown_regex = Regex::new(MARKDOWN_REGEX).expect("valid regex");
+    let markdown_regex = {
+        static REGEX: OnceCell<Regex> = OnceCell::new();
+        REGEX.get_or_init(|| Regex::new(MARKDOWN_REGEX).unwrap())
+    };
     let Some(markdown_cap) = markdown_regex.captures(&md_content) else {
         return Err(Error::MarkdownFormat(md_path));
     };
@@ -129,7 +133,10 @@ fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Erro
 
     check_answer(rs_path, &answer, &warnings)?;
 
-    let path_regex = Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
+    let path_regex = {
+        static REGEX: OnceCell<Regex> = OnceCell::new();
+        REGEX.get_or_init(|| Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").unwrap())
+    };
     let number = match path_regex.captures(rs_path.to_str().unwrap()) {
         Some(path_cap) => path_cap["num"]
             .parse::<u16>()
