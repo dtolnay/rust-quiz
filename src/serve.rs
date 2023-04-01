@@ -1,3 +1,4 @@
+use crate::Error;
 use futures::future::{self, BoxFuture, Ready};
 use http::response::Builder as ResponseBuilder;
 use http::{header, StatusCode};
@@ -22,7 +23,7 @@ enum MainFuture {
 }
 
 impl Future for MainFuture {
-    type Output = crate::Result<Response<Body>>;
+    type Output = Result<Response<Body>, Error>;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
         match self.project() {
@@ -31,10 +32,10 @@ impl Future for MainFuture {
                     .status(StatusCode::MOVED_PERMANENTLY)
                     .header(header::LOCATION, "/rust-quiz/")
                     .body(Body::empty())
-                    .map_err(crate::Error::Http);
+                    .map_err(Error::Http);
                 Poll::Ready(res)
             }
-            MainFutureProj::Static(future) => future.poll(cx).map_err(crate::Error::Io),
+            MainFutureProj::Static(future) => future.poll(cx).map_err(Error::Io),
         }
     }
 }
@@ -53,7 +54,7 @@ impl MainService {
 
 impl Service<Request<Body>> for MainService {
     type Response = Response<Body>;
-    type Error = crate::Error;
+    type Error = Error;
     type Future = MainFuture;
 
     fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
@@ -72,9 +73,9 @@ impl Service<Request<Body>> for MainService {
 struct MakeMainService;
 
 impl Service<&AddrStream> for MakeMainService {
-    type Error = crate::Error;
+    type Error = Error;
     type Response = MainService;
-    type Future = Ready<crate::Result<MainService>>;
+    type Future = Ready<Result<MainService, Error>>;
 
     fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
         Poll::Ready(Ok(()))
@@ -85,7 +86,7 @@ impl Service<&AddrStream> for MakeMainService {
     }
 }
 
-pub async fn main() -> crate::Result<()> {
+pub async fn main() -> Result<(), Error> {
     let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), PORT);
     let server = hyper::Server::try_bind(&addr)?.serve(MakeMainService);
 
@@ -95,5 +96,5 @@ pub async fn main() -> crate::Result<()> {
         PORT,
     );
 
-    server.await.map_err(crate::Error::Hyper)
+    server.await.map_err(Error::Hyper)
 }

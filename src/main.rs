@@ -8,7 +8,7 @@ mod error;
 mod render;
 mod serve;
 
-use crate::error::{Error, Result};
+use crate::error::Error;
 use clap::{Parser as ClapParser, Subcommand as ClapSubcommand};
 use oqueue::{Color::Red, Sequencer};
 use std::io::{self, Write};
@@ -42,7 +42,7 @@ enum Subcommand {
     Serve,
 }
 
-fn report(result: Result<()>) {
+fn report(result: Result<(), Error>) {
     if let Err(err) = result {
         let task = Sequencer::stderr().begin();
         task.bold_color(Red);

@@ -5,8 +5,6 @@ use std::path::PathBuf;
 use std::string::FromUtf8Error;
 use thiserror::Error;
 
-pub type Result<T> = std::result::Result<T, Error>;
-
 #[remain::sorted]
 #[derive(Error, Debug)]
 pub enum Error {

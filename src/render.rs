@@ -1,4 +1,4 @@
-use crate::error::{Error, Result};
+use crate::error::Error;
 use oqueue::{Color::Red, Sequencer};
 use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
@@ -49,7 +49,7 @@ pub const MARKDOWN_FORMAT: &str = "
     <!-- markdown -->
 ";
 
-pub fn main() -> Result<()> {
+pub fn main() -> Result<(), Error> {
     let mut question_files = Vec::new();
     for entry in fs::read_dir("questions")? {
         let entry = entry?;
@@ -105,7 +105,7 @@ fn worker(oqueue: &Sequencer, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Quest
     }
 }
 
-fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<()> {
+fn work(path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Error> {
     let code = fs::read_to_string(path)?;
 
     let Markdown {
@@ -147,7 +147,7 @@ struct Markdown {
     explanation: String,
 }
 
-fn parse_markdown(path: PathBuf) -> Result<Markdown> {
+fn parse_markdown(path: PathBuf) -> Result<Markdown, Error> {
     let content = fs::read_to_string(&path)?;
     let re = Regex::new(MARKDOWN_REGEX).expect("valid regex");
     let Some(cap) = re.captures(&content) else {
@@ -184,7 +184,7 @@ enum Status {
     Err,
 }
 
-fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<()> {
+fn check_answer(path: &Path, expected: &str, warnings: &[String]) -> Result<(), Error> {
     let out_dir = env::temp_dir().join("rust-quiz");
 
     let mut cmd = rustc(&out_dir, path);
@@ -250,7 +250,7 @@ fn rustc(out_dir: &Path, path: &Path) -> Command {
     cmd
 }
 
-fn run(out_dir: &Path, path: &Path, expected: &str) -> Result<()> {
+fn run(out_dir: &Path, path: &Path, expected: &str) -> Result<(), Error> {
     let stem = path.file_stem().unwrap();
     let exe = out_dir.join(stem).with_extension(EXE_EXTENSION);
     let output = Command::new(exe).output().map_err(Error::Execute)?;
