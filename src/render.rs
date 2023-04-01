@@ -108,19 +108,32 @@ fn worker(oqueue: &Sequencer, files: &[PathBuf], out: &Mutex<BTreeMap<u16, Quest
 fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Error> {
     let code = fs::read_to_string(rs_path)?;
 
-    let Markdown {
-        answer,
-        difficulty,
-        warnings,
-        hint,
-        explanation,
-    } = parse_markdown(rs_path.with_extension("md"))?;
+    let md_path = rs_path.with_extension("md");
+    let md_content = fs::read_to_string(&md_path)?;
+    let markdown_regex = Regex::new(MARKDOWN_REGEX).expect("valid regex");
+    let Some(markdown_cap) = markdown_regex.captures(&md_content) else {
+        return Err(Error::MarkdownFormat(md_path));
+    };
+
+    let mut warnings = Vec::new();
+    if let Some(regex_match) = markdown_cap.name("warnings") {
+        for word in regex_match.as_str().split(',') {
+            warnings.push(word.trim().to_owned());
+        }
+    }
+
+    let answer = markdown_cap["answer"].to_owned();
+    let difficulty = markdown_cap["difficulty"].parse().unwrap();
+    let hint = render_to_html(&markdown_cap["hint"]);
+    let explanation = render_to_html(&markdown_cap["explanation"]);
 
     check_answer(rs_path, &answer, &warnings)?;
 
-    let re = Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
-    let number = match re.captures(rs_path.to_str().unwrap()) {
-        Some(cap) => cap["num"].parse::<u16>().expect("three decimal digits"),
+    let path_regex = Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").expect("valid regex");
+    let number = match path_regex.captures(rs_path.to_str().unwrap()) {
+        Some(path_cap) => path_cap["num"]
+            .parse::<u16>()
+            .expect("three decimal digits"),
         None => return Err(Error::FilenameFormat),
     };
 
@@ -137,37 +150,6 @@ fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Erro
     );
 
     Ok(())
-}
-
-struct Markdown {
-    answer: String,
-    difficulty: u8,
-    warnings: Vec<String>,
-    hint: String,
-    explanation: String,
-}
-
-fn parse_markdown(md_path: PathBuf) -> Result<Markdown, Error> {
-    let content = fs::read_to_string(&md_path)?;
-    let re = Regex::new(MARKDOWN_REGEX).expect("valid regex");
-    let Some(cap) = re.captures(&content) else {
-        return Err(Error::MarkdownFormat(md_path));
-    };
-
-    let mut warnings = Vec::new();
-    if let Some(regex_match) = cap.name("warnings") {
-        for word in regex_match.as_str().split(',') {
-            warnings.push(word.trim().to_owned());
-        }
-    }
-
-    Ok(Markdown {
-        answer: cap["answer"].to_owned(),
-        difficulty: cap["difficulty"].parse().unwrap(),
-        warnings,
-        hint: render_to_html(&cap["hint"]),
-        explanation: render_to_html(&cap["explanation"]),
-    })
 }
 
 fn render_to_html(markdown: &str) -> String {
