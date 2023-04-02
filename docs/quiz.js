@@ -117,7 +117,7 @@ function initQuestion() {
 
 function activateQuestion() {
     current.innerHTML = q;
-    questionNumber.title = "Difficulty:  " + difficultyStars();
+    setDifficultyStars();
     show(questionNumber);
     code.innerHTML = "";
     code.appendChild(document.createTextNode(questions[q].code.trim()));
@@ -137,10 +137,14 @@ function activateQuestion() {
     accordion.classList.add("show");
 }
 
-function difficultyStars() {
-    var filled = questions[q].difficulty;
-    var empty = 3 - filled;
-    return "★".repeat(filled) + "☆".repeat(empty);
+function setDifficultyStars() {
+    if (questions[q].difficulty) {
+        var filled = questions[q].difficulty;
+        var empty = 3 - filled;
+        questionNumber.title = "Difficulty:  " + "★".repeat(filled) + "☆".repeat(empty);
+    } else {
+        questionNumber.removeAttribute("title");
+    }
 }
 
 function nextQuestion() {
