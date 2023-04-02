@@ -5,7 +5,7 @@ use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
 use rayon::ThreadPoolBuilder;
 use regex::Regex;
-use serde::Serialize;
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 use std::collections::BTreeMap;
 use std::env;
 use std::env::consts::EXE_EXTENSION;
@@ -13,13 +13,48 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
 
-#[derive(Serialize)]
 struct Question {
     code: String,
-    difficulty: u8,
-    answer: String,
-    hint: String,
-    explanation: String,
+    prose: Prose,
+}
+
+enum Prose {
+    Quiz {
+        difficulty: u8,
+        answer: String,
+        hint: String,
+        explanation: String,
+    },
+    Tombstone,
+}
+
+impl Serialize for Question {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match &self.prose {
+            Prose::Quiz {
+                difficulty,
+                answer,
+                hint,
+                explanation,
+            } => {
+                let mut s = serializer.serialize_struct("Question", 5)?;
+                s.serialize_field("code", &self.code)?;
+                s.serialize_field("difficulty", difficulty)?;
+                s.serialize_field("answer", answer)?;
+                s.serialize_field("hint", hint)?;
+                s.serialize_field("explanation", explanation)?;
+                s.end()
+            }
+            Prose::Tombstone => {
+                let mut s = serializer.serialize_struct("Question", 1)?;
+                s.serialize_field("code", &self.code)?;
+                s.end()
+            }
+        }
+    }
 }
 
 pub const MARKDOWN_REGEX: &str = r"(?msx)
@@ -111,27 +146,38 @@ fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Erro
 
     let md_path = rs_path.with_extension("md");
     let md_content = fs::read_to_string(&md_path)?;
-    let markdown_regex = {
-        static REGEX: OnceCell<Regex> = OnceCell::new();
-        REGEX.get_or_init(|| Regex::new(MARKDOWN_REGEX).unwrap())
-    };
-    let Some(markdown_cap) = markdown_regex.captures(&md_content) else {
-        return Err(Error::MarkdownFormat(md_path));
-    };
+    let prose = if md_content.trim() == "tombstone" {
+        Prose::Tombstone
+    } else {
+        let markdown_regex = {
+            static REGEX: OnceCell<Regex> = OnceCell::new();
+            REGEX.get_or_init(|| Regex::new(MARKDOWN_REGEX).unwrap())
+        };
+        let Some(markdown_cap) = markdown_regex.captures(&md_content) else {
+            return Err(Error::MarkdownFormat(md_path));
+        };
 
-    let mut warnings = Vec::new();
-    if let Some(regex_match) = markdown_cap.name("warnings") {
-        for word in regex_match.as_str().split(',') {
-            warnings.push(word.trim().to_owned());
+        let mut warnings = Vec::new();
+        if let Some(regex_match) = markdown_cap.name("warnings") {
+            for word in regex_match.as_str().split(',') {
+                warnings.push(word.trim().to_owned());
+            }
         }
-    }
 
-    let answer = markdown_cap["answer"].to_owned();
-    let difficulty = markdown_cap["difficulty"].parse().unwrap();
-    let hint = render_to_html(&markdown_cap["hint"]);
-    let explanation = render_to_html(&markdown_cap["explanation"]);
+        let answer = markdown_cap["answer"].to_owned();
+        let difficulty = markdown_cap["difficulty"].parse().unwrap();
+        let hint = render_to_html(&markdown_cap["hint"]);
+        let explanation = render_to_html(&markdown_cap["explanation"]);
 
-    check_answer(rs_path, &answer, &warnings)?;
+        check_answer(rs_path, &answer, &warnings)?;
+
+        Prose::Quiz {
+            difficulty,
+            answer,
+            hint,
+            explanation,
+        }
+    };
 
     let path_regex = {
         static REGEX: OnceCell<Regex> = OnceCell::new();
@@ -145,17 +191,7 @@ fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Erro
     };
 
     let mut map = out.lock();
-    map.insert(
-        number,
-        Question {
-            code,
-            difficulty,
-            answer,
-            hint,
-            explanation,
-        },
-    );
-
+    map.insert(number, Question { code, prose });
     Ok(())
 }
 

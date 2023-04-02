@@ -10,6 +10,7 @@ var accordion = document.getElementById("accordion");
 var code = document.getElementById("code");
 
 var form = document.getElementById("form");
+var tombstone = document.getElementById("tombstone");
 
 // Radio buttons.
 var radioUndefined = document.getElementById("radio-undefined");
@@ -133,6 +134,13 @@ function activateQuestion() {
     textOutput.value = "";
     buttonHint.disabled = false;
     show(nav);
+    if (questions[q].answer) {
+        show(form);
+        hide(tombstone);
+    } else {
+        hide(form);
+        show(tombstone);
+    }
     setTitle();
     accordion.classList.add("show");
 }
@@ -248,7 +256,7 @@ function pickRandomQuestion() {
     var unanswered = [];
     for (var i in questions) {
         var number = parseInt(i, 10);
-        if (isNaN(number) || number === q) {
+        if (isNaN(number) || number === q || !questions[number].answer) {
             continue;
         }
         candidates.push(number);
@@ -272,7 +280,9 @@ function setTitle() {
 function countQuestions() {
     var size = 0;
     for (var key in questions) {
-        size += 1;
+        if (questions[key].answer) {
+            size += 1;
+        }
     }
     return size;
 }
@@ -280,7 +290,7 @@ function countQuestions() {
 function updateProgress() {
     var count = 0;
     for (var key in questions) {
-        if (state[key]) {
+        if (questions[key].answer && state[key]) {
             count++;
         }
     }
