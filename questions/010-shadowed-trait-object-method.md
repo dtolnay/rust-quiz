@@ -16,11 +16,6 @@ This question contains a trait method `Trait::f` as well as an inherent method
 method is literally uncallable. There is currently no syntax in Rust for calling
 the inherent `f` on `dyn Trait`.
 
-If the trait method were named something different and only the inherent method
-were called `f`, then the first two lines of `main` would successfully call the
-inherent method. However, as written with shadowed names, they disambiguate to
-the trait method.
-
 One additional syntax to try would be:
 
 ```rust
