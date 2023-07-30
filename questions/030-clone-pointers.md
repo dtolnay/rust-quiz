@@ -1,6 +1,6 @@
 Answer: 111011
 Difficulty: 1
-Warnings: unused_variables
+Warnings: noop_method_call, unused_variables
 
 # Hint
 
