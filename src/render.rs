@@ -1,5 +1,4 @@
 use crate::error::Error;
-use once_cell::sync::OnceCell;
 use oqueue::{Color::Red, Sequencer};
 use parking_lot::Mutex;
 use pulldown_cmark::{html as markdown_html, Parser as MarkdownParser};
@@ -12,6 +11,7 @@ use std::env::consts::EXE_EXTENSION;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command, Stdio};
+use std::sync::OnceLock;
 
 struct Question {
     code: String,
@@ -150,7 +150,7 @@ fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Erro
         Prose::Tombstone
     } else {
         let markdown_regex = {
-            static REGEX: OnceCell<Regex> = OnceCell::new();
+            static REGEX: OnceLock<Regex> = OnceLock::new();
             REGEX.get_or_init(|| Regex::new(MARKDOWN_REGEX).unwrap())
         };
         let Some(markdown_cap) = markdown_regex.captures(&md_content) else {
@@ -180,7 +180,7 @@ fn work(rs_path: &Path, out: &Mutex<BTreeMap<u16, Question>>) -> Result<(), Erro
     };
 
     let path_regex = {
-        static REGEX: OnceCell<Regex> = OnceCell::new();
+        static REGEX: OnceLock<Regex> = OnceLock::new();
         REGEX.get_or_init(|| Regex::new(r"questions/(?P<num>[0-9]{3})[a-z0-9-]+\.rs").unwrap())
     };
     let number = match path_regex.captures(rs_path.to_str().unwrap()) {
