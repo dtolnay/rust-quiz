@@ -21,9 +21,6 @@ pub enum Error {
     Http(#[from] http::Error),
 
     #[error(transparent)]
-    Hyper(#[from] hyper::Error),
-
-    #[error(transparent)]
     Io(#[from] io::Error),
 
     #[error(transparent)]
