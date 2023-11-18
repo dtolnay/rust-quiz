@@ -1,11 +1,12 @@
 use crate::Error;
-use futures::future::{self, BoxFuture, Ready};
+use futures::future::BoxFuture;
 use http::response::Builder as ResponseBuilder;
-use http::{header, StatusCode};
-use hyper::server::conn::AddrStream;
+use http::{header, Request, Response, StatusCode};
+use hyper::body::Incoming;
+use hyper::server::conn::http1;
 use hyper::service::Service;
-use hyper::{Body, Request, Response};
-use hyper_staticfile::Static;
+use hyper_staticfile::{Body, Static};
+use hyper_util::rt::TokioIo;
 use pin_project::pin_project;
 use std::future::Future;
 use std::io::{self, Write};
@@ -13,6 +14,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::Path;
 use std::pin::Pin;
 use std::task::{Context, Poll};
+use tokio::net::TcpListener;
 
 const PORT: u16 = 8000;
 
@@ -31,7 +33,7 @@ impl Future for MainFuture {
                 let res = ResponseBuilder::new()
                     .status(StatusCode::MOVED_PERMANENTLY)
                     .header(header::LOCATION, "/rust-quiz/")
-                    .body(Body::empty())
+                    .body(Body::Empty)
                     .map_err(Error::Http);
                 Poll::Ready(res)
             }
@@ -52,16 +54,12 @@ impl MainService {
     }
 }
 
-impl Service<Request<Body>> for MainService {
+impl Service<Request<Incoming>> for MainService {
     type Response = Response<Body>;
     type Error = Error;
     type Future = MainFuture;
 
-    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        Poll::Ready(Ok(()))
-    }
-
-    fn call(&mut self, req: Request<Body>) -> Self::Future {
+    fn call(&self, req: Request<Incoming>) -> Self::Future {
         if req.uri().path() == "/" {
             MainFuture::Root
         } else {
@@ -70,25 +68,9 @@ impl Service<Request<Body>> for MainService {
     }
 }
 
-struct MakeMainService;
-
-impl Service<&AddrStream> for MakeMainService {
-    type Error = Error;
-    type Response = MainService;
-    type Future = Ready<Result<MainService, Error>>;
-
-    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        Poll::Ready(Ok(()))
-    }
-
-    fn call(&mut self, _target: &AddrStream) -> Self::Future {
-        future::ok(MainService::new())
-    }
-}
-
 pub async fn main() -> Result<(), Error> {
     let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), PORT);
-    let server = hyper::Server::try_bind(&addr)?.serve(MakeMainService);
+    let listener = TcpListener::bind(addr).await?;
 
     let _ = writeln!(
         io::stderr(),
@@ -96,5 +78,16 @@ pub async fn main() -> Result<(), Error> {
         PORT,
     );
 
-    server.await.map_err(Error::Hyper)
+    loop {
+        let (tcp_stream, _socket_addr) = listener.accept().await?;
+        let io = TokioIo::new(tcp_stream);
+        tokio::task::spawn(async move {
+            if let Err(err) = http1::Builder::new()
+                .serve_connection(io, MainService::new())
+                .await
+            {
+                let _ = writeln!(io::stderr(), "{}", err);
+            }
+        });
+    }
 }

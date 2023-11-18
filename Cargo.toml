@@ -13,9 +13,10 @@ repository = "https://github.com/dtolnay/rust-quiz"
 [dependencies]
 clap = { version = "4", features = ["deprecated", "derive"] }
 futures = "0.3"
-http = "0.2"
-hyper = { version = "0.14", features = ["http1", "http2", "server", "tcp"] }
-hyper-staticfile = "0.9"
+http = "1"
+hyper = { version = "1", features = ["http1", "http2", "server"] }
+hyper-staticfile = "0.10"
+hyper-util = { version = "0.1", features = ["tokio"] }
 num_cpus = "1.0"
 oqueue = "0.1"
 parking_lot = "0.12"
