@@ -1,6 +1,5 @@
 Answer: 10
 Difficulty: 1
-Warnings: non_local_definitions
 
 # Hint
 
