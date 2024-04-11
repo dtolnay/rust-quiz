@@ -19,7 +19,7 @@ paragraph is:
 
 Applying these rules to the given examples, we have:
 * `t.f()`: We try to find a function `f` defined on the type `T`, but there is
-  none. Next, we search the type `&T`, and find the first implemenation of the
+  none. Next, we search the type `&T`, and find the first implementation of the
   `Or` trait, and we are done. Upon invocation, the resolved call prints `1`.
 * `wt.f()`: We search for a function `f` defined on `&T`, which immediately
   succeeds. Upon invocation, the function prints `1`.

@@ -20,7 +20,7 @@ reason:
 > order, and often lead to subtle bugs and undefined behavior in C and C++. `x =
 > x + 1` or `x += 1` is only slightly longer, but unambiguous.
 
-In the absense of a decrement operator, `--x` is parsed as `-(-x)`. In the case
+In the absence of a decrement operator, `--x` is parsed as `-(-x)`. In the case
 of `x = 4` this would be `-(-4)` which is `4`. The program is equivalent to:
 
 ```rust

@@ -16,7 +16,7 @@ as Trait>::f(&S)` in order to call the trait method.
 
 It is important for macro authors to be aware of this. Macro-generated code
 typically should not use method call syntax to invoke trait methods on types
-defined by the user. Those calls could get unintentially hijacked by inherent
+defined by the user. Those calls could get unintentionally hijacked by inherent
 methods having the same name as the trait method.
 
 On the other hand, `S.g()` calls the trait method `g`. Auto-ref during method

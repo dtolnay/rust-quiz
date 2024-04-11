@@ -20,6 +20,6 @@ reason:
 > order, and often lead to subtle bugs and undefined behavior in C and C++. `x =
 > x + 1` or `x += 1` is only slightly longer, but unambiguous.
 
-In the absense of postfix and prefix decrement operators, `a-- - --b` is parsed
+In the absence of postfix and prefix decrement operators, `a-- - --b` is parsed
 as `a - (-(-(-(-b))))`. In the case of `a = 5` and `b = 3` the value of this
 expression is `5 - 3` which is `2`.
