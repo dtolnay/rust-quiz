@@ -1,6 +1,7 @@
 #![allow(
     clippy::let_underscore_untyped,
     clippy::match_bool,
+    clippy::needless_lifetimes,
     clippy::needless_return, // https://github.com/tokio-rs/tokio/issues/6869
     clippy::uninlined_format_args
 )]
