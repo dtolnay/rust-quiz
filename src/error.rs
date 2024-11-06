@@ -27,8 +27,8 @@ pub enum Error {
     Json(#[from] serde_json::Error),
 
     #[error(
-        "{0} does not match the expected format.\n{}",
-        crate::render::MARKDOWN_FORMAT
+        "{0} does not match the expected format.\n{markdown}",
+        markdown = crate::render::MARKDOWN_FORMAT
     )]
     MarkdownFormat(PathBuf),
 
