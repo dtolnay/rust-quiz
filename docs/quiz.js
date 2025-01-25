@@ -46,7 +46,7 @@ var total = document.getElementById("total");
 var buttonReset = document.getElementById("reset");
 
 function init() {
-    window.onpopstate = function(event) {
+    window.onpopstate = function (event) {
         function activate() {
             if (event.state) {
                 q = event.state.question;
@@ -65,17 +65,17 @@ function init() {
     buttonHint.onclick = doHint;
     buttonSkip.onclick = nextQuestion;
     buttonReveal.onclick = doReveal;
-    textOutput.onclick = function() {
+    textOutput.onclick = function () {
         radioOutput.checked = true;
     };
-    textOutput.oninput = function() {
+    textOutput.oninput = function () {
         hide(incorrect);
         radioOutput.checked = true;
     };
-    radioUndefined.onchange = radioError.onchange = function() {
+    radioUndefined.onchange = radioError.onchange = function () {
         hide(incorrect);
     };
-    radioOutput.onchange = function() {
+    radioOutput.onchange = function () {
         hide(incorrect);
         textOutput.select();
     };
@@ -110,10 +110,8 @@ function initQuestion() {
     try {
         setTitle();
         var path = "/rust-quiz/" + q;
-        window.history.replaceState({question: q}, document.title, path);
-    }
-    catch(e) {
-    }
+        window.history.replaceState({ question: q }, document.title, path);
+    } catch (e) {}
 }
 
 function activateQuestion() {
@@ -149,7 +147,8 @@ function setDifficultyStars() {
     if (questions[q].difficulty) {
         var filled = questions[q].difficulty;
         var empty = 3 - filled;
-        questionNumber.title = "Difficulty:  " + "★".repeat(filled) + "☆".repeat(empty);
+        questionNumber.title =
+            "Difficulty:  " + "★".repeat(filled) + "☆".repeat(empty);
     } else {
         questionNumber.removeAttribute("title");
     }
@@ -163,10 +162,8 @@ function nextQuestion() {
 
         try {
             var path = "/rust-quiz/" + q;
-            window.history.pushState({question: q}, document.title, path);
-        }
-        catch(e) {
-        }
+            window.history.pushState({ question: q }, document.title, path);
+        } catch (e) {}
     }
 
     accordion.classList.remove("show");
@@ -226,8 +223,8 @@ function showExplanation() {
         textOutput.value = questions[q].answer;
     }
     buttonPlayground.href =
-        "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&code="
-        + encodeURIComponent(questions[q].code.trim());
+        "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&code=" +
+        encodeURIComponent(questions[q].code.trim());
     show(buttonPlayground);
     show(explanationAlert);
     textOutput.blur();
@@ -332,8 +329,7 @@ function storageAvailable() {
         window.localStorage.setItem(x, x);
         window.localStorage.removeItem(x);
         return true;
-    }
-    catch(e) {
+    } catch (e) {
         return false;
     }
 }
