@@ -46,292 +46,292 @@ var total = document.getElementById("total");
 var buttonReset = document.getElementById("reset");
 
 function init() {
-    window.onpopstate = function (event) {
-        function activate() {
-            if (event.state) {
-                q = event.state.question;
-            } else {
-                initQuestion();
-            }
-            activateQuestion();
-        }
-
-        accordion.classList.remove("show");
-        window.setTimeout(activate, 400);
-    };
-    form.addEventListener("submit", checkAnswer);
-    buttonNext.onclick = nextQuestion;
-    buttonSubmit.onclick = checkAnswer;
-    buttonHint.onclick = doHint;
-    buttonSkip.onclick = nextQuestion;
-    buttonReveal.onclick = doReveal;
-    textOutput.onclick = function () {
-        radioOutput.checked = true;
-    };
-    textOutput.oninput = function () {
-        hide(incorrect);
-        radioOutput.checked = true;
-    };
-    radioUndefined.onchange = radioError.onchange = function () {
-        hide(incorrect);
-    };
-    radioOutput.onchange = function () {
-        hide(incorrect);
-        textOutput.select();
-    };
-    total.innerHTML = countQuestions();
-    loadState();
-    updateProgress();
-    initQuestion();
-    activateQuestion();
-}
-
-function initQuestion() {
-    var history = window.history.state;
-    if (history && typeof history.question === "number") {
-        q = history.question;
-        return;
-    }
-
-    var path = window.location.pathname;
-    var pathMatch = /^\/rust-quiz\/([0-9]+)\/?$/g.exec(path);
-    if (pathMatch !== null) {
-        var key = pathMatch[1];
-        var number = parseInt(key, 10);
-        if (!isNaN(number) && key in questions) {
-            q = number;
-        }
-    }
-
-    if (typeof q === "undefined") {
-        pickRandomQuestion();
-    }
-
-    try {
-        setTitle();
-        var path = "/rust-quiz/" + q;
-        window.history.replaceState({ question: q }, document.title, path);
-    } catch (e) {}
-}
-
-function activateQuestion() {
-    current.innerHTML = q;
-    setDifficultyStars();
-    show(questionNumber);
-    code.innerHTML = "";
-    code.appendChild(document.createTextNode(questions[q].code.trim()));
-    hljs.highlightBlock(code);
-    hide(buttonPlayground);
-    hide(explanationAlert);
-    hide(incorrect);
-    hide(hintAlert);
-    buttonSkip.blur();
-    radioUndefined.checked = false;
-    radioError.checked = false;
-    radioOutput.checked = false;
-    textOutput.value = "";
-    buttonHint.disabled = false;
-    show(nav);
-    if (questions[q].answer) {
-        show(form);
-        hide(tombstone);
-    } else {
-        hide(form);
-        show(tombstone);
-    }
-    setTitle();
-    accordion.classList.add("show");
-}
-
-function setDifficultyStars() {
-    if (questions[q].difficulty) {
-        var filled = questions[q].difficulty;
-        var empty = 3 - filled;
-        questionNumber.title =
-            "Difficulty:  " + "★".repeat(filled) + "☆".repeat(empty);
-    } else {
-        questionNumber.removeAttribute("title");
-    }
-}
-
-function nextQuestion() {
+  window.onpopstate = function (event) {
     function activate() {
-        loadState();
-        pickRandomQuestion();
-        activateQuestion();
-
-        try {
-            var path = "/rust-quiz/" + q;
-            window.history.pushState({ question: q }, document.title, path);
-        } catch (e) {}
+      if (event.state) {
+        q = event.state.question;
+      } else {
+        initQuestion();
+      }
+      activateQuestion();
     }
 
     accordion.classList.remove("show");
     window.setTimeout(activate, 400);
+  };
+  form.addEventListener("submit", checkAnswer);
+  buttonNext.onclick = nextQuestion;
+  buttonSubmit.onclick = checkAnswer;
+  buttonHint.onclick = doHint;
+  buttonSkip.onclick = nextQuestion;
+  buttonReveal.onclick = doReveal;
+  textOutput.onclick = function () {
+    radioOutput.checked = true;
+  };
+  textOutput.oninput = function () {
+    hide(incorrect);
+    radioOutput.checked = true;
+  };
+  radioUndefined.onchange = radioError.onchange = function () {
+    hide(incorrect);
+  };
+  radioOutput.onchange = function () {
+    hide(incorrect);
+    textOutput.select();
+  };
+  total.innerHTML = countQuestions();
+  loadState();
+  updateProgress();
+  initQuestion();
+  activateQuestion();
+}
+
+function initQuestion() {
+  var history = window.history.state;
+  if (history && typeof history.question === "number") {
+    q = history.question;
+    return;
+  }
+
+  var path = window.location.pathname;
+  var pathMatch = /^\/rust-quiz\/([0-9]+)\/?$/g.exec(path);
+  if (pathMatch !== null) {
+    var key = pathMatch[1];
+    var number = parseInt(key, 10);
+    if (!isNaN(number) && key in questions) {
+      q = number;
+    }
+  }
+
+  if (typeof q === "undefined") {
+    pickRandomQuestion();
+  }
+
+  try {
+    setTitle();
+    var path = "/rust-quiz/" + q;
+    window.history.replaceState({ question: q }, document.title, path);
+  } catch (e) {}
+}
+
+function activateQuestion() {
+  current.innerHTML = q;
+  setDifficultyStars();
+  show(questionNumber);
+  code.innerHTML = "";
+  code.appendChild(document.createTextNode(questions[q].code.trim()));
+  hljs.highlightBlock(code);
+  hide(buttonPlayground);
+  hide(explanationAlert);
+  hide(incorrect);
+  hide(hintAlert);
+  buttonSkip.blur();
+  radioUndefined.checked = false;
+  radioError.checked = false;
+  radioOutput.checked = false;
+  textOutput.value = "";
+  buttonHint.disabled = false;
+  show(nav);
+  if (questions[q].answer) {
+    show(form);
+    hide(tombstone);
+  } else {
+    hide(form);
+    show(tombstone);
+  }
+  setTitle();
+  accordion.classList.add("show");
+}
+
+function setDifficultyStars() {
+  if (questions[q].difficulty) {
+    var filled = questions[q].difficulty;
+    var empty = 3 - filled;
+    questionNumber.title =
+      "Difficulty:  " + "★".repeat(filled) + "☆".repeat(empty);
+  } else {
+    questionNumber.removeAttribute("title");
+  }
+}
+
+function nextQuestion() {
+  function activate() {
+    loadState();
+    pickRandomQuestion();
+    activateQuestion();
+
+    try {
+      var path = "/rust-quiz/" + q;
+      window.history.pushState({ question: q }, document.title, path);
+    } catch (e) {}
+  }
+
+  accordion.classList.remove("show");
+  window.setTimeout(activate, 400);
 }
 
 function checkAnswer(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    var correct;
-    if (radioUndefined.checked) {
-        correct = questions[q].answer === "undefined";
-    } else if (radioError.checked) {
-        correct = questions[q].answer === "error";
-    } else if (radioOutput.checked) {
-        correct = questions[q].answer === textOutput.value.trim();
-    } else {
-        buttonSubmit.blur();
-        return false;
-    }
-
-    if (correct) {
-        show(explanationCorrect);
-        recordCorrect();
-        showExplanation();
-    } else {
-        show(incorrect);
-        buttonSubmit.blur();
-    }
-
+  var correct;
+  if (radioUndefined.checked) {
+    correct = questions[q].answer === "undefined";
+  } else if (radioError.checked) {
+    correct = questions[q].answer === "error";
+  } else if (radioOutput.checked) {
+    correct = questions[q].answer === textOutput.value.trim();
+  } else {
+    buttonSubmit.blur();
     return false;
+  }
+
+  if (correct) {
+    show(explanationCorrect);
+    recordCorrect();
+    showExplanation();
+  } else {
+    show(incorrect);
+    buttonSubmit.blur();
+  }
+
+  return false;
 }
 
 function doHint() {
-    hintContent.innerHTML = questions[q].hint.trim();
-    show(hintAlert);
-    buttonHint.blur();
-    buttonHint.disabled = true;
+  hintContent.innerHTML = questions[q].hint.trim();
+  show(hintAlert);
+  buttonHint.blur();
+  buttonHint.disabled = true;
 }
 
 function doReveal() {
-    hide(explanationCorrect);
-    showExplanation();
+  hide(explanationCorrect);
+  showExplanation();
 }
 
 function showExplanation() {
-    hide(incorrect);
-    hide(nav);
-    hide(hintAlert);
-    explanationContent.innerHTML = questions[q].explanation.trim();
-    if (questions[q].answer === "undefined") {
-        radioUndefined.checked = true;
-    } else if (questions[q].answer === "error") {
-        radioError.checked = true;
-    } else {
-        radioOutput.checked = true;
-        textOutput.value = questions[q].answer;
-    }
-    buttonPlayground.href =
-        "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&code=" +
-        encodeURIComponent(questions[q].code.trim());
-    show(buttonPlayground);
-    show(explanationAlert);
-    textOutput.blur();
+  hide(incorrect);
+  hide(nav);
+  hide(hintAlert);
+  explanationContent.innerHTML = questions[q].explanation.trim();
+  if (questions[q].answer === "undefined") {
+    radioUndefined.checked = true;
+  } else if (questions[q].answer === "error") {
+    radioError.checked = true;
+  } else {
+    radioOutput.checked = true;
+    textOutput.value = questions[q].answer;
+  }
+  buttonPlayground.href =
+    "https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&code=" +
+    encodeURIComponent(questions[q].code.trim());
+  show(buttonPlayground);
+  show(explanationAlert);
+  textOutput.blur();
 }
 
 function loadState() {
-    if (storageAvailable()) {
-        var json = window.localStorage.getItem("rust-quiz-answered");
-        if (json) {
-            state = JSON.parse(json);
-        } else {
-            state = {};
-        }
+  if (storageAvailable()) {
+    var json = window.localStorage.getItem("rust-quiz-answered");
+    if (json) {
+      state = JSON.parse(json);
+    } else {
+      state = {};
     }
+  }
 }
 
 function saveState() {
-    if (storageAvailable()) {
-        var json = JSON.stringify(state);
-        window.localStorage.setItem("rust-quiz-answered", json);
-    }
+  if (storageAvailable()) {
+    var json = JSON.stringify(state);
+    window.localStorage.setItem("rust-quiz-answered", json);
+  }
 }
 
 function pickRandomQuestion() {
-    var candidates = [];
-    var unanswered = [];
-    for (var i in questions) {
-        var number = parseInt(i, 10);
-        if (isNaN(number) || number === q || !questions[number].answer) {
-            continue;
-        }
-        candidates.push(number);
-        if (!state[number]) {
-            unanswered.push(number);
-        }
+  var candidates = [];
+  var unanswered = [];
+  for (var i in questions) {
+    var number = parseInt(i, 10);
+    if (isNaN(number) || number === q || !questions[number].answer) {
+      continue;
     }
-
-    if (unanswered.length > 0) {
-        candidates = unanswered;
+    candidates.push(number);
+    if (!state[number]) {
+      unanswered.push(number);
     }
+  }
 
-    var rand = Math.floor(Math.random() * candidates.length);
-    q = candidates[rand];
+  if (unanswered.length > 0) {
+    candidates = unanswered;
+  }
+
+  var rand = Math.floor(Math.random() * candidates.length);
+  q = candidates[rand];
 }
 
 function setTitle() {
-    document.title = "Rust Quiz #" + q;
+  document.title = "Rust Quiz #" + q;
 }
 
 function countQuestions() {
-    var size = 0;
-    for (var key in questions) {
-        if (questions[key].answer) {
-            size += 1;
-        }
+  var size = 0;
+  for (var key in questions) {
+    if (questions[key].answer) {
+      size += 1;
     }
-    return size;
+  }
+  return size;
 }
 
 function updateProgress() {
-    var count = 0;
-    for (var key in questions) {
-        if (questions[key].answer && state[key]) {
-            count++;
-        }
+  var count = 0;
+  for (var key in questions) {
+    if (questions[key].answer && state[key]) {
+      count++;
     }
-    answered.innerHTML = count;
-    if (count === countQuestions()) {
-        show(contribute);
-    }
-    if (count > 0) {
-        show(buttonReset);
-    }
+  }
+  answered.innerHTML = count;
+  if (count === countQuestions()) {
+    show(contribute);
+  }
+  if (count > 0) {
+    show(buttonReset);
+  }
 }
 
 function recordCorrect() {
-    loadState();
-    state[q] = true;
-    saveState();
-    updateProgress();
+  loadState();
+  state[q] = true;
+  saveState();
+  updateProgress();
 }
 
 function reset() {
-    state = {};
-    window.localStorage.clear();
-    answered.innerHTML = 0;
-    hide(contribute);
-    hide(buttonReset);
+  state = {};
+  window.localStorage.clear();
+  answered.innerHTML = 0;
+  hide(contribute);
+  hide(buttonReset);
 }
 
 function show(element) {
-    element.classList.remove("d-none");
+  element.classList.remove("d-none");
 }
 
 function hide(element) {
-    element.classList.add("d-none");
+  element.classList.add("d-none");
 }
 
 function storageAvailable() {
-    try {
-        var x = "__storage_test__";
-        window.localStorage.setItem(x, x);
-        window.localStorage.removeItem(x);
-        return true;
-    } catch (e) {
-        return false;
-    }
+  try {
+    var x = "__storage_test__";
+    window.localStorage.setItem(x, x);
+    window.localStorage.removeItem(x);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 init();
