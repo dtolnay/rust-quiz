@@ -44,6 +44,7 @@ var incorrect = document.getElementById("incorrect");
 var answered = document.getElementById("answered");
 var total = document.getElementById("total");
 var buttonReset = document.getElementById("reset");
+var contribute = document.getElementById("contribute");
 
 function init() {
   window.onpopstate = function (event) {
@@ -109,8 +110,8 @@ function initQuestion() {
 
   try {
     setTitle();
-    var path = "/rust-quiz/" + q;
-    window.history.replaceState({ question: q }, document.title, path);
+    var newPath = "/rust-quiz/" + q;
+    window.history.replaceState({ question: q }, document.title, newPath);
   } catch (e) {}
 }
 
