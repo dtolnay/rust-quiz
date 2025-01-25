@@ -7,12 +7,12 @@ Temporaries are not dropped in the same way in `let` statements and assignments.
 
 # Explanation
 
-In both cases, since we don't assign the `NoisyDrop` instance to a variable, it
-is a [temporary].
+In both cases, since we don't assign the `Drop0` instance to a variable, it is a
+[temporary].
 
 In `let` statements, [temporary lifetime extension][tle] takes place and extends
 the temporary's lifetime until the end of the block, there it is dropped. So `1`
-is printed first, and then the `NoisyDrop` is dropped and `0` is printed.
+is printed first, and then the `Drop0` is dropped and `0` is printed.
 
 In assignments, however (`_ = ` is a [destructuring assignment][des_assign]),
 there is no temporary lifetime extension, and temporaries are dropped at the end

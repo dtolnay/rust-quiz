@@ -1,5 +1,5 @@
-struct NoisyDrop;
-impl Drop for NoisyDrop {
+struct Drop0;
+impl Drop for Drop0 {
     fn drop(&mut self) {
         print!("0");
     }
@@ -7,11 +7,11 @@ impl Drop for NoisyDrop {
 
 fn main() {
     {
-        let _ = &NoisyDrop;
+        let _ = &Drop0;
         print!("1");
     }
     {
-        _ = &NoisyDrop;
+        _ = &Drop0;
         print!("1");
     }
 }
