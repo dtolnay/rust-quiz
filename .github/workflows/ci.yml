@@ -49,6 +49,16 @@ jobs:
           toolchain: ${{matrix.rust}}
       - run: cargo check
 
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install
+      - run: npx eslint
+
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
