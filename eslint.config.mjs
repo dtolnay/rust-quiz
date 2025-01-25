@@ -13,7 +13,7 @@ export default [
   {
     files: ["docs/questions.js"],
     rules: {
-      "no-unused-vars": ["off"],
+      "no-unused-vars": ["error", { varsIgnorePattern: "^questions$" }],
     },
   },
   {
@@ -24,6 +24,13 @@ export default [
         questions: "readonly",
         ...globals.browser,
       },
+    },
+    rules: {
+      "no-empty": ["error", { allowEmptyCatch: true }],
+      "no-unused-vars": [
+        "error",
+        { caughtErrors: "none", varsIgnorePattern: "^reset$" },
+      ],
     },
   },
 ];
