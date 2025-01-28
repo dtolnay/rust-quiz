@@ -1,6 +1,6 @@
 Answer: 2
 Difficulty: 1
-Warnings: unused_mut
+Warnings: double_negations, unused_mut
 
 # Hint
 
