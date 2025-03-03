@@ -1,4 +1,5 @@
 #![allow(
+    clippy::elidable_lifetime_names,
     clippy::let_underscore_untyped,
     clippy::match_bool,
     clippy::needless_lifetimes,
