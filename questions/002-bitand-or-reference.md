@@ -28,6 +28,6 @@ The closure body consists of an empty block-statement `{}` followed by a
 *reference* to `S(4)`, not a bitwise-AND. The type of `i` is `impl Fn() ->
 &'static S`.
 
-The parsing of this case is governed by [this code][classify] in libsyntax.
+The parsing of this case is governed by [this code][classify] in rustc\_ast.
 
-[classify]: https://github.com/rust-lang/rust/blob/1.30.1/src/libsyntax/parse/classify.rs#L17-L37
+[classify]: https://github.com/rust-lang/rust/blob/1.90.0/compiler/rustc_ast/src/util/classify.rs#L78-L83
