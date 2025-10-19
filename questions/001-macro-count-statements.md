@@ -124,8 +124,8 @@ It remains to determine how many statements are in the three invocations of
     ```
 
     The list of expression types that stand alone without a semicolon is defined
-    [here][classify] in libsyntax. The distinction informs a few different early
-    bail-out cases where the parser decides to finish parsing the current
+    [here][classify] in rustc\_ast. The distinction informs a few different
+    early bail-out cases where the parser decides to finish parsing the current
     expression.
 
     Relevant to our case is that block expressions `{ /* ... */ }` terminate an
@@ -156,6 +156,6 @@ It remains to determine how many statements are in the three invocations of
     }
     ```
 
-[classify]: https://github.com/rust-lang/rust/blob/1.30.1/src/libsyntax/parse/classify.rs#L17-L37
+[classify]: https://github.com/rust-lang/rust/blob/1.90.0/compiler/rustc_ast/src/util/classify.rs#L78-L83
 
 Anyhow, the output of the program is `112`.

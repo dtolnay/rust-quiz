@@ -88,6 +88,6 @@ We want to know whether each possible parenthesization of `return || true;` and
     broken the behavior intentionally.
 
 [Rust 1.19]: https://blog.rust-lang.org/2017/07/20/Rust-1.19.html
-[Crater]: https://github.com/rust-lang-nursery/crater
+[Crater]: https://github.com/rust-lang/crater
 
 The total output from `main` is `221111`.
