@@ -27,6 +27,6 @@ the end of the block and so `1` is printed first then `0`.
 [scoped]: https://doc.rust-lang.org/stable/reference/destructors.html#r-destructors.scope.temporary
 [temporary]: https://doc.rust-lang.org/stable/reference/expressions.html#temporaries
 [tle]: https://doc.rust-lang.org/stable/reference/destructors.html#temporary-lifetime-extension
-[assignment]: https://doc.rust-lang.org/stable/reference/expressions/operator-expr.html?highlight=destructuring#r-expr.assign.destructure
-[und_expr]: https://doc.rust-lang.org/stable/reference/expressions/underscore-expr.html?highlight=underscore#_-expressions
+[assignment]: https://doc.rust-lang.org/stable/reference/expressions/operator-expr.html#r-expr.assign.destructure
+[und_expr]: https://doc.rust-lang.org/stable/reference/expressions/underscore-expr.html#_-expressions
 [expr_ext]: https://doc.rust-lang.org/stable/reference/destructors.html#r-destructors.scope.lifetime-extension.exprs
