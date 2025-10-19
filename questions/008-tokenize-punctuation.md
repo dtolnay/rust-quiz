@@ -13,7 +13,7 @@ are grouped according to how those characters are used by native Rust tokens.
 [This page][tokens] contains a list of the single-character and multi-character
 punctuation tokens involved in the Rust grammar.
 
-[tokens]: https://docs.rs/syn/0.15.22/syn/token/index.html#structs
+[tokens]: https://docs.rs/syn/2/syn/token/index.html#structs
 
 As one example from that list, `<<=` is a single token because the Rust grammar
 uses that sequence of characters to mean [left shift assignment][ShlAssign].
