@@ -31,6 +31,12 @@ jobs:
           cargo run
           git checkout -- questions
           git diff --exit-code
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: Cargo.lock
+          path: Cargo.lock
+        continue-on-error: true
 
   check:
     name: Rust ${{matrix.rust}}
