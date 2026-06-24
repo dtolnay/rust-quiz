@@ -79,6 +79,12 @@ p code {
     color: crimson;
 }
 
+pre code {
+  font-size: .875em;
+  color: var(--bs-code-color);
+  word-wrap: break-word;
+}
+
 #form label {
     display: inline !important;
 }
@@ -94,4 +100,34 @@ a code {
 blockquote {
     padding-left: 30px;
     font-style: italic;
+}
+
+.toggle-theme {
+  display: table-row;
+  vertical-align: bottom;
+  text-align: right;
+  height: 0;
+  line-height: 0;
+}
+
+.toggle-theme-link {
+  display: inline-block;
+  height: 0;
+  position: relative;
+  right: 70px;
+  bottom: 10px;
+}
+
+.toggle-theme-link:after {
+  content: "[Toggle Theme]";
+}
+
+[data-bs-theme=dark] p code {
+  --bs-code-color: #dd8888;
+  color: var(--bs-code-color);
+}
+
+[data-bs-theme=light] p code {
+  --bs-code-color: crimson;
+  color: var(--bs-code-color);
 }
