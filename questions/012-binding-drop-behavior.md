@@ -19,8 +19,8 @@ longer has an owner.
 [destructure]: https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#destructuring-to-break-apart-values
 
 In the second `let`-binding, we borrow a field `x` from the owner of a value of
-type `S` using a `ref` pattern, causing the entire value scope of type `S` to
-be [extended] to the end of `main`.
+type `S` using a `ref` pattern. The scope of the temporary on the right-hand
+side is [extended] to the end of `main`.
 
 [extended]: https://doc.rust-lang.org/reference/destructors.html#extending-based-on-patterns
 
