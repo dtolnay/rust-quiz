@@ -19,7 +19,7 @@ hyper-staticfile = "0.10"
 hyper-util = { version = "0.1", features = ["tokio"] }
 num_cpus = "1"
 oqueue = "0.1"
-parking_lot = "0.12"
+parking_lot = "0.13"
 pin-project = "1"
 pulldown-cmark = "0.13"
 rayon = "1"
